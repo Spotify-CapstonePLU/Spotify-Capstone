@@ -11,7 +11,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,15 +23,13 @@ class _LoginPageState extends State<LoginPage> {
               style: const TextStyle(fontSize: 30),
             ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const VotelistsPage())
-                );
-              },
-              child: const Text('go to votelists page')
-            )
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const VotelistsPage()));
+                },
+                child: const Text('go to votelists page'))
           ],
         ),
       ),
