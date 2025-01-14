@@ -1,76 +1,180 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class SongCards extends StatefulWidget {
-  const SongCards({
+class SongCardList extends StatefulWidget {
+  const SongCardList({
     super.key,
-    required this.songs,
+    required this.songCards,
     required this.onAdd,
   });
 
-  final List<String> songs;
+  final List<SongCardData> songCards;
   final VoidCallback onAdd;
 
   @override
-  State<StatefulWidget> createState() => _SongCardsState();
+  State<StatefulWidget> createState() => _SongCardListState();
 }
 
-class _SongCardsState extends State<SongCards> {
+class _SongCardListState extends State<SongCardList> {
+  final int displayListMax = 5;
 
   @override
   Widget build(BuildContext context) {
-    const double boxWidth = 600;
-    const double boxHeight = 700;
-    const double overlapOffset = 20; // Vertical spacing for the stack
-    const int displayListMax = 5;
+    double screenWidth = MediaQuery.sizeOf(context).width;
+    double screenHeight = MediaQuery.sizeOf(context).height;
+
+    const double aspectRatio = 2 / 3;
+
+    final maxHeight = screenHeight;
+    final maxWidth = maxHeight * aspectRatio;
+
+    final containerWidth = maxWidth > screenWidth ? screenWidth : maxWidth;
+    final containerHeight = containerWidth / aspectRatio;
+
+    final double overlapOffset = containerHeight * 0.05;
+
+    final start = widget.songCards.length > displayListMax ? widget.songCards.length - displayListMax : 0;
+    final displayCards = widget.songCards.skip(start).take(displayListMax).toList();
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Stack container
         SizedBox(
-          width: boxWidth,
-          height: (5 * overlapOffset) + boxHeight,
-          child: Stack(// Allow overflow for stack positioning
+          width: containerWidth * 0.6,
+          height: containerHeight * 0.6,
+          child:
+          Stack(
             children: [
-              // Render boxes in the correct order for z-axis layering
-              for (int i = (widget.songs.length > displayListMax ? displayListMax : widget.songs.length) - 1; i >= 0; i--)
+              for (int i = displayCards.length - 1; i >= 0; i--)
                 Positioned(
-                  // The first item will appear in front and others will be behind
-                  bottom: (i * 20), // Controls vertical offset
-                  child: Container(
-                    width: boxWidth,
-                    height: boxHeight,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Color.lerp(
-                        Colors.blue[300]!,  // Brightest color (for the oldest box)
-                        Colors.blue[900]!,  // Darkest color (for the newest box)
-                        i / (displayListMax - 1),  // Adjust interpolation
-                      ),
-                      borderRadius: BorderRadius.circular(50.0),
-                    ),
-                    child: Text(
-                      widget.songs[i],
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+                    bottom:
+                        i * overlapOffset - (i * i * containerHeight * 0.005),
+                    left: 0,
+                    right: 0,
+                    child: Builder(builder: (context) {
+                      if ((displayCards.length - 1 - i) ==
+                          displayCards.length - 1) {
+                        return Draggable(
+                          data: displayCards.length - 1 - i,
+                          feedback: ConstrainedBox(
+                            constraints: BoxConstraints.tightFor(
+                              width: containerWidth *
+                                  0.6, // Set the same width as the child
+                              height: containerHeight *
+                                  0.45, // Set the same height as the child
+                            ),
+                            child: SongCard(
+                                cardData:
+                                    displayCards[displayCards.length - 1 - i],
+                                index: i),
+                          ),
+                          childWhenDragging: const SizedBox.shrink(),
+                          child: SongCard(
+                              cardData:
+                                  displayCards[displayCards.length - 1 - i],
+                              index: i),
+                        );
+                      }
+                      return SongCard(
+                          cardData: displayCards[displayCards.length - 1 - i],
+                          index: i);
+                    })),
             ],
           ),
         ),
-        const SizedBox(height: 20), // Spacing between the stack and the button
-        // Add Box button
-        ElevatedButton(
-          onPressed: widget.onAdd,
-          child: const Text("Add Box"),
-        ),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          ElevatedButton(
+            onPressed: widget.onAdd,
+            child: Text("Add Song",
+                style: TextStyle(fontSize: containerWidth * 0.03)),
+          ),
+        ]),
       ],
     );
-
   }
+}
+
+class SongCard extends StatefulWidget {
+  const SongCard({super.key, required this.cardData, required this.index});
+
+  final int index;
+  final SongCardData cardData;
+
+  @override
+  State<StatefulWidget> createState() => _SongCardState();
+}
+
+class _SongCardState extends State<SongCard> {
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.sizeOf(context).width;
+    double screenHeight = MediaQuery.sizeOf(context).height;
+
+    const double aspectRatio = 2 / 3;
+
+    final maxHeight = screenHeight;
+    final maxWidth = maxHeight * aspectRatio;
+
+    final containerWidth = maxWidth > screenWidth ? screenWidth : maxWidth;
+    final containerHeight = containerWidth / aspectRatio;
+
+    var songCard = Card(
+      margin: EdgeInsets.all(containerWidth * 0.01),
+      elevation: 0.0,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black
+              .withOpacity(0.15 * widget.index), // Tint color with opacity
+          borderRadius:
+              BorderRadius.circular(11.0), // Match card's border radius
+        ),
+        child: ColorFiltered(
+          colorFilter: ColorFilter.mode(
+            Colors.black
+                .withOpacity(0.15 * widget.index), // Tint color for contents
+            BlendMode.srcATop, // Blend mode for tinting
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: EdgeInsets.all(containerWidth *
+                    0.01), // Adjust the padding value as needed
+                child: widget.cardData.trackArt,
+              ),
+              Padding(
+                padding: EdgeInsets.all(containerHeight * 0.01),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.cardData.songName,
+                      style: TextStyle(fontSize: containerWidth * 0.03),
+                    ),
+                    Text(
+                      widget.cardData.artistName,
+                      style: TextStyle(fontSize: containerWidth * 0.03),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    return songCard;
+  }
+}
+
+class SongCardData {
+  const SongCardData({
+    required this.songName,
+    required this.trackArt,
+    required this.artistName,
+  });
+
+  final String songName;
+  final String artistName;
+  final Image trackArt;
 }
