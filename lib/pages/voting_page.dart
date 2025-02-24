@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spotify_polls/custom_app_bar.dart';
 import 'package:spotify_polls/songQue.dart';
 
 class VotingPage extends StatefulWidget {
@@ -15,21 +16,16 @@ class _VotingPageState extends State<VotingPage> {
   int yesCounter = 0;
   @override
   Widget build(BuildContext context) {
-    double shortestSide = MediaQuery.sizeOf(context).shortestSide;
 
     return Scaffold(
+      appBar: CustomAppBar(title: widget.title),
       body: Stack(
         children: [
-          const BackButton(),
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  widget.title,
-                  style: const TextStyle(fontSize: 30),
-                ),
                 const SizedBox(
                   height: 20,
                   width: 50,

@@ -39,7 +39,6 @@ class _SongCardListState extends State<SongCardList> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("Container for Song cards"),
         SizedBox(
           width: containerWidth * 0.6,
           height: containerHeight * 0.6,

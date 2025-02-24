@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:spotify_polls/custom_app_bar.dart';
 import 'package:spotify_polls/pages/live_login_page.dart';
 import 'package:spotify_polls/media_items.dart';
 import 'package:spotify_polls/tappable_media_item.dart';
@@ -163,6 +164,7 @@ class _VotelistsPageState extends State<VotelistsPage> {
     }
 
     return Scaffold(
+      appBar: CustomAppBar(title: widget.title),
       body: Stack(
         children: [
           GestureDetector(
@@ -175,10 +177,6 @@ class _VotelistsPageState extends State<VotelistsPage> {
                   Center(
                     child: Column(
                       children: [
-                        const Text(
-                          "Votelists",
-                          style: TextStyle(fontSize: 20),
-                        ),
                         Container(
                           padding: const EdgeInsets.symmetric(vertical: 20),
                           constraints:
