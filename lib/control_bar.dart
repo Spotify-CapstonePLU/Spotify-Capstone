@@ -75,7 +75,9 @@ class _ControlBarState extends State<ControlBar> {
           padding: EdgeInsets.fromLTRB(0, widget.size * 0.03 , 0, 0),
           child: ElevatedButton(
               style: queueButtonStyle,
-              onPressed: () {},
+              onPressed: () {
+                Scaffold.of(context).openEndDrawer();
+              },
               child:
               Icon(Icons.queue_music, size: buttonIconSize)),
         )
