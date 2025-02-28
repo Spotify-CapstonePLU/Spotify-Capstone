@@ -28,7 +28,9 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               TitleSection(),
-              SizedBox(height: 100,),
+              SizedBox(
+                height: 100,
+              ),
               ButtonSection(),
             ],
           ),
@@ -55,7 +57,9 @@ class TitleSection extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineLarge,
             textAlign: TextAlign.center,
           )),
-          const SizedBox(height: 25,),
+          const SizedBox(
+            height: 25,
+          ),
           Flexible(
               child: Text(
             constants.appDescription,
