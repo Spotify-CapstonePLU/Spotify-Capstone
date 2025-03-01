@@ -43,18 +43,19 @@ class MediaItem extends StatelessWidget {
     double itemMargin = containerHeight * 0.01;
     double itemPadding = containerHeight * 0.01;
     double imageSizeConstraint = containerHeight * 0.09;
-    return Container(
-      margin: EdgeInsets.fromLTRB(itemMargin, 0, itemMargin, itemMargin),
-      padding: EdgeInsets.all(itemPadding),
-      constraints: BoxConstraints(
-        maxHeight: containerHeight * 0.12
-      ),
-      decoration: const BoxDecoration(
-        color: Colors.blue
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
+    return GestureDetector(
+      onTap: () {
+        if (onTap != null) {
+          onTap!();
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.fromLTRB(itemMargin, 0, itemMargin, itemMargin),
+        padding: EdgeInsets.all(itemPadding),
+        constraints: BoxConstraints(maxHeight: containerHeight * 0.12),
+        decoration: const BoxDecoration(color: Colors.blue),
+        child:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Row(
             children: [
               Container(
@@ -78,33 +79,6 @@ class MediaItem extends StatelessWidget {
           IconButton(onPressed: () => {}, icon: const Icon(Icons.more_vert))
         ]
       ),
-    );
-  }
-}
-
-class TappableMediaItem extends StatefulWidget {
-  const TappableMediaItem ({super.key,
-    required this.itemData,
-    this.onTap
-  });
-
-  final Function? onTap;
-  final MediaItemData itemData;
-
-  @override
-  State<StatefulWidget> createState() => _TappableMediaItemState();
-}
-
-class _TappableMediaItemState extends State<TappableMediaItem> {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        if (widget.onTap != null) {
-          widget.onTap!();
-        }
-      },
-      child: MediaItem(itemData: widget.itemData),
     );
   }
 }
