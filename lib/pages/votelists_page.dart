@@ -167,8 +167,10 @@ class _VotelistsPageState extends State<VotelistsPage> {
         children: [
           GestureDetector(
               onTap: () {
-                log("cancel new votelist");
-                _toggleBlur();
+                if (_isBlurred) {
+                  log("cancel new votelist");
+                  _toggleBlur();
+                }
               },
               child: Stack(
                 children: [
