@@ -180,7 +180,17 @@ class _VotelistsPageState extends State<VotelistsPage> {
                           "Votelists",
                           style: TextStyle(fontSize: 20),
                         ),
-                        MediaItemList(mediaItems: [])
+                        MediaItemList(mediaItems: [
+                          for (var itemData in votelists)
+                            MediaItem(
+                              itemData: itemData,
+                              onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const VotingPage())),
+                            )
+                        ])
                       ],
                     ),
                   ),
