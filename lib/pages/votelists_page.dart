@@ -134,7 +134,7 @@ class _VotelistsPageState extends State<VotelistsPage> {
                   const SizedBox(height: 20),
                   MediaItemList(mediaItems: [
                     for (var itemData in playlists)
-                      TappableMediaItem(
+                      MediaItem(
                         itemData: itemData,
                         onTap: () {
                           Navigator.of(context).pop(itemData);
