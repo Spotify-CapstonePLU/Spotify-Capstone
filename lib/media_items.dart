@@ -10,6 +10,10 @@ class MediaItemList<Widget> extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => _MediaItemListState();
+
+  void add(MediaItemData itemData, [VoidCallback? onTap]) {
+    mediaItems.add(MediaItem(itemData: itemData, onTap: onTap));
+  }
 }
 
 class _MediaItemListState extends State<MediaItemList> {
