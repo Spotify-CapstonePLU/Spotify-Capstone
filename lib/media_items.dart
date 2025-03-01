@@ -6,7 +6,7 @@ class MediaItemList<Widget> extends StatefulWidget {
     required this.mediaItems,
   });
 
-  final List<Widget> mediaItems;
+  final List<MediaItem> mediaItems;
 
   @override
   State<StatefulWidget> createState() => _MediaItemListState();
