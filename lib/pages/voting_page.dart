@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spotify_polls/custom_app_bar.dart';
+import 'package:spotify_polls/widgets/custom_app_bar.dart';
 import 'package:spotify_polls/songQue.dart';
 
 class VotingPage extends StatefulWidget {

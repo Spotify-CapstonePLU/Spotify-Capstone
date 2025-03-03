@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'media_items.dart';
+import 'package:spotify_polls/widgets/media_items.dart';
 
 class SongQueue extends StatefulWidget {
   const SongQueue({super.key, required this.data});
