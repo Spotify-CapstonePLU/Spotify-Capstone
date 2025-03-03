@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_polls/control_bar.dart';
+import 'package:spotify_polls/custom_app_bar.dart';
 import 'package:spotify_polls/song_cards.dart';
 import 'package:spotify_polls/song_queue.dart';
 
 import '../media_items.dart';
 
 class LiveRoomPage extends StatefulWidget {
-  const LiveRoomPage({super.key, this.title = "Live Room Page"});
+  const LiveRoomPage({super.key, this.title = "Live Room"});
 
   final String title;
 
@@ -57,9 +58,9 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
 
     return Scaffold(
         endDrawer: SongQueue(data: liveQueueData),
+      appBar: CustomAppBar(title: widget.title),
         body: Stack(
           children: [
-            const BackButton(),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
