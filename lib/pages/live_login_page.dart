@@ -34,7 +34,6 @@ class _LiveLoginPageState extends State<LiveLoginPage> {
         log("submit button pressed");
         log("input: ${myController.text}");
         if (myController.text == password) {
-          myController.dispose();
           log("correct password");
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const LiveRoomPage()));
@@ -44,6 +43,7 @@ class _LiveLoginPageState extends State<LiveLoginPage> {
             isWrong = true;
           });
         }
+        myController.clear();
       },
       child: const Text("Submit"),
     );

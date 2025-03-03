@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:spotify_polls/pages/login_page.dart';
+import 'package:spotify_polls/pages/home_page.dart';
+import '../styles/themes.dart' as theme;
 
 void main() {
   runApp(const MyApp());
@@ -12,11 +13,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const LoginPage(),
+      theme: theme.defaultTheme,
+      home: const HomePage(),
     );
   }
 }
