@@ -1,10 +1,11 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:spotify_polls/widgets/custom_app_bar.dart';
 import 'package:spotify_polls/pages/live_room_page.dart';
 
 class LiveLoginPage extends StatefulWidget {
-  const LiveLoginPage({super.key, this.title = "Live Page"});
+  const LiveLoginPage({super.key, this.title = "Live Room Login"});
 
   final String title;
 
@@ -34,7 +35,6 @@ class _LiveLoginPageState extends State<LiveLoginPage> {
         log("submit button pressed");
         log("input: ${myController.text}");
         if (myController.text == password) {
-          myController.dispose();
           log("correct password");
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const LiveRoomPage()));
@@ -44,6 +44,7 @@ class _LiveLoginPageState extends State<LiveLoginPage> {
             isWrong = true;
           });
         }
+        myController.clear();
       },
       child: const Text("Submit"),
     );
@@ -51,17 +52,12 @@ class _LiveLoginPageState extends State<LiveLoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    double shortestSide = MediaQuery.sizeOf(context).shortestSide;
-
     return Scaffold(
+      appBar: CustomAppBar(title: widget.title,),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              widget.title,
-              style: const TextStyle(fontSize: 30),
-            ),
             inputField(),
             displayInputFieldValueSubmit(),
             ElevatedButton(
