@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:spotify_polls/custom_app_bar.dart';
+import 'package:spotify_polls/widgets/custom_app_bar.dart';
 import 'package:spotify_polls/pages/live_room_page.dart';
 
 class LiveLoginPage extends StatefulWidget {

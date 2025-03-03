@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:spotify_polls/custom_app_bar.dart';
+import 'package:spotify_polls/widgets/custom_app_bar.dart';
 import 'package:spotify_polls/pages/live_login_page.dart';
 import 'package:spotify_polls/widgets/media_items.dart';
 import 'package:spotify_polls/widgets/tappable_media_item.dart';
