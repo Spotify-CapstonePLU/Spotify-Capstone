@@ -31,6 +31,9 @@ migrate_working_dir/
 .pub/
 /build/
 
+# Javascript related
+node_modules/
+
 # Symbolication related
 app.*.symbols
 

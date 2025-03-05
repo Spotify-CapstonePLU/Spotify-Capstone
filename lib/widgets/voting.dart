@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spotify_polls/song_cards.dart';
+import 'package:spotify_polls/widgets/song_cards.dart';
 
 class Voting extends StatefulWidget {
   const Voting({super.key,
@@ -57,7 +57,7 @@ class _VotingState extends State<Voting> {
                   candidateData.isNotEmpty
                       ? 'Hovering: ${candidateData.first}' // Access the first item in the list
                       : 'Drag an item here!',
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
             );
@@ -83,7 +83,7 @@ class _VotingState extends State<Voting> {
                   candidateData.isNotEmpty
                       ? 'Hovering: ${candidateData.first}' // Access the first item in the list
                       : 'Drag an item here!',
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
             );
