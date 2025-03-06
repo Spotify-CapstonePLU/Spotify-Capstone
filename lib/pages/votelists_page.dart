@@ -110,8 +110,6 @@ class _VotelistsPageState extends State<VotelistsPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Get screen size and FAB dimensions
-    double screenWidth = MediaQuery.sizeOf(context).width;
     double screenHeight = MediaQuery.sizeOf(context).height;
 
     const double fabHeight = 56.0; // Default FAB height
@@ -134,7 +132,7 @@ class _VotelistsPageState extends State<VotelistsPage> {
                   const Text("Register popup", style: TextStyle(fontSize: 18)),
                   const SizedBox(height: 20),
                   SizedBox(
-                    height: MediaQuery.sizeOf(context).height * 0.7,
+                    height: screenHeight * 0.7,
                     child: MediaItemList(mediaItems: [
                       for (var itemData in playlists)
                         MediaItem(
