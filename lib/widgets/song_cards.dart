@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spotify_polls/ring_chart.dart';
+import 'package:spotify_polls/widgets/ring_chart.dart';
 
 class SongCardList extends StatefulWidget {
   const SongCardList({
@@ -39,7 +39,6 @@ class _SongCardListState extends State<SongCardList> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("Container for Song cards"),
         SizedBox(
           width: containerWidth * 0.6,
           height: containerHeight * 0.6,

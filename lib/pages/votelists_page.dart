@@ -2,8 +2,9 @@ import 'dart:developer';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:spotify_polls/widgets/custom_app_bar.dart';
 import 'package:spotify_polls/pages/live_login_page.dart';
-import 'package:spotify_polls/media_items.dart';
+import 'package:spotify_polls/widgets/media_items.dart';
 import 'package:spotify_polls/pages/voting_page.dart';
 
 class VotelistsPage extends StatefulWidget {
@@ -165,6 +166,7 @@ class _VotelistsPageState extends State<VotelistsPage> {
     }
 
     return Scaffold(
+      appBar: CustomAppBar(title: widget.title),
       body: Stack(
         children: [
           GestureDetector(
@@ -179,10 +181,6 @@ class _VotelistsPageState extends State<VotelistsPage> {
                   Center(
                     child: Column(
                       children: [
-                        const Text(
-                          "Votelists",
-                          style: TextStyle(fontSize: 20),
-                        ),
                         MediaItemList(mediaItems: [
                           for (var itemData in votelists)
                             MediaItem(
