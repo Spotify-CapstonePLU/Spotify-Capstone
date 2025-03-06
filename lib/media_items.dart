@@ -19,12 +19,16 @@ class MediaItemList<Widget> extends StatefulWidget {
 class _MediaItemListState extends State<MediaItemList> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        for (var i = 0; i < widget.mediaItems.length; i++) widget.mediaItems[i],
-      ],
-    );
+    var parentHeight = MediaQuery.sizeOf(context).height;
+    return
+        SizedBox(
+          height: parentHeight * 0.9, // Set a fixed height
+          child: ListView(
+            children: [
+              for (var i = 0; i < widget.mediaItems.length; i++) widget.mediaItems[i],
+            ],
+          ),
+        );
   }
 }
 

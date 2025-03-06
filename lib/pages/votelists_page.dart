@@ -132,15 +132,18 @@ class _VotelistsPageState extends State<VotelistsPage> {
                 children: [
                   const Text("Register popup", style: TextStyle(fontSize: 18)),
                   const SizedBox(height: 20),
-                  MediaItemList(mediaItems: [
-                    for (var itemData in playlists)
-                      MediaItem(
-                        itemData: itemData,
-                        onTap: () {
-                          Navigator.of(context).pop(itemData);
-                        },
-                      )
-                  ]),
+                  SizedBox(
+                    height: MediaQuery.sizeOf(context).height * 0.7,
+                    child: MediaItemList(mediaItems: [
+                      for (var itemData in playlists)
+                        MediaItem(
+                          itemData: itemData,
+                          onTap: () {
+                            Navigator.of(context).pop(itemData);
+                          },
+                        )
+                    ]),
+                  ),
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
