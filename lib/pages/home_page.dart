@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:spotify_polls/pages/live_login_page.dart';
 import '../assets/constants.dart' as constants;
+import 'package:spotify_polls/services/api_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, this.title = "Home Page"});
@@ -81,6 +83,7 @@ class ButtonSection extends StatelessWidget {
           TextButton(
               onPressed: () {
                 log("clicked Sign In");
+                ApiService.getSpotifyAuthorization();
               },
               child: const Text(constants.signIn)),
           TextButton(
