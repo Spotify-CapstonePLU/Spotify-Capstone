@@ -3,16 +3,21 @@ import 'package:flutter/material.dart';
 class MediaItemList<Widget> extends StatefulWidget {
   const MediaItemList({
     super.key,
-    required this.mediaItems,
+    required this.listData,
   });
 
-  final List<MediaItem> mediaItems;
+  final List<MediaItemData> listData;
 
   @override
   State<StatefulWidget> createState() => _MediaItemListState();
 
   void add(MediaItemData itemData, [VoidCallback? onTap]) {
-    mediaItems.add(MediaItem(itemData: itemData, onTap: onTap));
+    listData.add(MediaItemData(
+        title: itemData.title,
+        details: itemData.details,
+        imageUrl: itemData.imageUrl,
+        onTap: onTap,
+    ));
   }
 }
 
