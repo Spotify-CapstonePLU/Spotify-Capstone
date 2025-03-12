@@ -181,19 +181,23 @@ class _VotelistsPageState extends State<VotelistsPage> {
                   Center(
                     child: Column(
                       children: [
-                        MediaItemList(listData: [
-                          for (var itemData in votelists)
-                            MediaItemData(
-                              title: itemData.title,
-                              details: itemData.details,
-                              imageUrl: itemData.imageUrl,
-                              onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const VotingPage())),
-                            )
-                        ])
+                        SizedBox(
+                          width: MediaQuery.sizeOf(context).width * 0.8,
+                          height: MediaQuery.sizeOf(context).height * 0.8,
+                          child: MediaItemList(listData: [
+                            for (var itemData in votelists)
+                              MediaItemData(
+                                title: itemData.title,
+                                details: itemData.details,
+                                imageUrl: itemData.imageUrl,
+                                onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const VotingPage())),
+                              )
+                          ]),
+                        )
                       ],
                     ),
                   ),
