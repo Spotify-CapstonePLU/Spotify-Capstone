@@ -24,33 +24,36 @@ class MediaItemList<Widget> extends StatefulWidget {
 class _MediaItemListState extends State<MediaItemList> {
   @override
   Widget build(BuildContext context) {
-    var parentHeight = MediaQuery.sizeOf(context).height;
-    return
-    SizedBox(
-      height: parentHeight * 0.8,
-      child:
-      ListView.separated(
-        itemBuilder: (_, index) {
-          var curData = widget.listData[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: ListTile(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              tileColor: Colors.amber,
-              leading: Image.network(curData.imageUrl),
-              title: Text(curData.title),
-              subtitle: Text(curData.details),
-              onTap: curData.onTap,
-            ),
-          );
-        },
-        separatorBuilder: (_, __) => const SizedBox(
-          height: 10,
+    return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.blueAccent),
         ),
-        itemCount: widget.listData.length,
-      ),
-    );
+        child: ClipRRect(
+            child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemBuilder: (_, index) {
+                      var curData = widget.listData[index];
+                      return Material(
+                        child: ListTile(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                          tileColor: Colors.amber,
+                          leading: Image.network(curData.imageUrl),
+                          title: Text(curData.title),
+                          subtitle: Text(curData.details),
+                          onTap: curData.onTap,
+                        ),
+                      );
+                    },
+                    separatorBuilder: (_, __) => const SizedBox(
+                      height: 10,
+                    ),
+                    itemCount: widget.listData.length,
+                  ),
+                )));
   }
 }
 
