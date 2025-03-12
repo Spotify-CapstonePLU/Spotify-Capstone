@@ -133,10 +133,12 @@ class _VotelistsPageState extends State<VotelistsPage> {
                   const SizedBox(height: 20),
                   SizedBox(
                     height: screenHeight * 0.7,
-                    child: MediaItemList(mediaItems: [
+                    child: MediaItemList(listData: [
                       for (var itemData in playlists)
-                        MediaItem(
-                          itemData: itemData,
+                        MediaItemData(
+                          title: itemData.title,
+                          details: itemData.details,
+                          imageUrl: itemData.imageUrl,
                           onTap: () {
                             Navigator.of(context).pop(itemData);
                           },
@@ -179,10 +181,12 @@ class _VotelistsPageState extends State<VotelistsPage> {
                   Center(
                     child: Column(
                       children: [
-                        MediaItemList(mediaItems: [
+                        MediaItemList(listData: [
                           for (var itemData in votelists)
-                            MediaItem(
-                              itemData: itemData,
+                            MediaItemData(
+                              title: itemData.title,
+                              details: itemData.details,
+                              imageUrl: itemData.imageUrl,
                               onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
