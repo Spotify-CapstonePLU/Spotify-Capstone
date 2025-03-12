@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_polls/widgets/media_items.dart';
 
-class SongQueue extends StatefulWidget {
-  const SongQueue({super.key, required this.data});
+class SongDrawer extends StatefulWidget {
+  const SongDrawer({super.key, required this.data});
   final List<MediaItemData> data;
   @override
-  State<StatefulWidget> createState() => _SongQueue();
+  State<StatefulWidget> createState() => _SongDrawer();
 }
 
-class _SongQueue extends State<SongQueue> {
+class _SongDrawer extends State<SongDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
