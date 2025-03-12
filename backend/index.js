@@ -28,6 +28,14 @@ app.get("/callback", async (req, res) => {
   var code = req.query.code || null;
   var state = req.query.state || null;
 
+  if(code === null) {
+    return res.redirect(
+      "/#" +
+        querystring.stringify({
+          error: "code_mismatch",
+        })
+    )
+  }
   if (state === null) {
     return res.redirect(
       "/#" +
@@ -36,21 +44,32 @@ app.get("/callback", async (req, res) => {
         })
     );
   } else {
-    const response = await axios.post(
-      "https://accounts.spotify.com/api/token",
-      querystring.stringify({
-        code: code,
-        redirect_uri: REDIRECT_URI,
-        grant_type: "authorization_code",
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-      }),
-      {
-        headers: {
-          "content-type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
+    let response;
+    try {
+      response = await axios.post(
+        "https://accounts.spotify.com/api/token",
+        querystring.stringify({
+          code: code,
+          redirect_uri: REDIRECT_URI,
+          grant_type: "authorization_code",
+          client_id: CLIENT_ID,
+          client_secret: CLIENT_SECRET,
+        }),
+        {
+          headers: {
+            "content-type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      return res.redirect(
+        "/#" +
+        querystring.stringify({
+          error: "invalid authorization code",
+        })
+      )
+    }
 
     const access_token = response.data.access_token;
     const expires_in = response.data.expires_in * 1000;
