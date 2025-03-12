@@ -26,14 +26,31 @@ class _MediaItemListState extends State<MediaItemList> {
   Widget build(BuildContext context) {
     var parentHeight = MediaQuery.sizeOf(context).height;
     return
-        SizedBox(
-          height: parentHeight * 0.9, // Set a fixed height
-          child: ListView(
-            children: [
-              for (var i = 0; i < widget.mediaItems.length; i++) widget.mediaItems[i],
-            ],
-          ),
-        );
+    SizedBox(
+      height: parentHeight * 0.8,
+      child:
+      ListView.separated(
+        itemBuilder: (_, index) {
+          var curData = widget.listData[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              tileColor: Colors.amber,
+              leading: Image.network(curData.imageUrl),
+              title: Text(curData.title),
+              subtitle: Text(curData.details),
+              onTap: curData.onTap,
+            ),
+          );
+        },
+        separatorBuilder: (_, __) => const SizedBox(
+          height: 10,
+        ),
+        itemCount: widget.listData.length,
+      ),
+    );
   }
 }
 
