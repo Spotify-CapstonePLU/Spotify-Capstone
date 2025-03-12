@@ -181,23 +181,25 @@ class _VotelistsPageState extends State<VotelistsPage> {
                   Center(
                     child: Column(
                       children: [
-                        SizedBox(
-                          width: MediaQuery.sizeOf(context).width * 0.8,
-                          height: MediaQuery.sizeOf(context).height * 0.8,
-                          child: MediaItemList(listData: [
-                            for (var itemData in votelists)
-                              MediaItemData(
-                                title: itemData.title,
-                                details: itemData.details,
-                                imageUrl: itemData.imageUrl,
-                                onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const VotingPage())),
-                              )
-                          ]),
-                        )
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: MediaItemList(
+                              listData: [
+                                for (var itemData in votelists)
+                                  MediaItemData(
+                                    title: itemData.title,
+                                    details: itemData.details,
+                                    imageUrl: itemData.imageUrl,
+                                    onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const VotingPage())),
+                                  )
+                              ],
+                            ),
+                        ))
                       ],
                     ),
                   ),
