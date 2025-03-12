@@ -123,6 +123,9 @@ async function VerifyTokens(req, res, next) {
       secure: false, // Set to true when deploying to production
       maxAge: expires_in, // 1 hour before expiring
     });
+    
+    next();
+    return;
   } else {
     console.log("User has not logged in yet. Redirecting to login...");
     var state = generateRandomString(16);
