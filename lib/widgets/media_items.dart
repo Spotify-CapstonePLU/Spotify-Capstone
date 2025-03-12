@@ -13,10 +13,10 @@ class MediaItemList<Widget> extends StatefulWidget {
 
   void add(MediaItemData itemData, [VoidCallback? onTap]) {
     listData.add(MediaItemData(
-        title: itemData.title,
-        details: itemData.details,
-        imageUrl: itemData.imageUrl,
-        onTap: onTap,
+      title: itemData.title,
+      details: itemData.details,
+      imageUrl: itemData.imageUrl,
+      onTap: onTap,
     ));
   }
 }
@@ -56,7 +56,6 @@ class _MediaItemListState extends State<MediaItemList> {
                 )));
   }
 }
-
 
 class MediaItemData {
   const MediaItemData({
