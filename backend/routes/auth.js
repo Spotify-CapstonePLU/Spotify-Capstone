@@ -1,40 +1,34 @@
 const express = require("express");
 const axios = require("axios");
-
-const cookieParser = require("cookie-parser");
 const querystring = require("querystring");
+const cookieParser = require("cookie-parser");
 
-const app = express();
-app.use(cookieParser());
-const PORT = 3000;
+const router = express.Router();
 
 require("dotenv").config();
+router.use(cookieParser());
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
 const SPOTIFY_SCOPES = process.env.SPOTIFY_SCOPES;
 
-app.get("/", (req, res) => {
-  res.send("Backend server for Spotify App is running!");
-});
-
-app.get("/auth", VerifyTokens, (req, res) => {
+router.get("/", VerifyTokens, (req, res) => {
   console.log("User is authenticated!");
-  res.send(req.cookies)
+  res.send(req.cookies);
 });
 
-app.get("/callback", async (req, res) => {
+router.get("/callback", async (req, res) => {
   var code = req.query.code || null;
   var state = req.query.state || null;
 
-  if(code === null) {
+  if (code === null) {
     return res.redirect(
       "/#" +
         querystring.stringify({
           error: "code_mismatch",
         })
-    )
+    );
   }
   if (state === null) {
     return res.redirect(
@@ -65,10 +59,10 @@ app.get("/callback", async (req, res) => {
       console.log(error);
       return res.redirect(
         "/#" +
-        querystring.stringify({
-          error: "invalid authorization code",
-        })
-      )
+          querystring.stringify({
+            error: "invalid authorization code",
+          })
+      );
     }
 
     const access_token = response.data.access_token;
@@ -90,28 +84,11 @@ app.get("/callback", async (req, res) => {
   res.send("User has been authenticated!");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://127.0.0.1:${PORT}`);
-});
-
-function generateRandomString(length) {
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-
-  return result;
-}
-
 async function VerifyTokens(req, res, next) {
   const access_token = req.cookies.access_token;
   if (access_token) {
     console.log("Access token found!");
-    next();
-    return;
+    return next();
   }
 
   console.log("No access token found!");
@@ -142,9 +119,8 @@ async function VerifyTokens(req, res, next) {
       secure: false, // Set to true when deploying to production
       maxAge: expires_in, // 1 hour before expiring
     });
-    
-    next();
-    return;
+
+    return next();
   } else {
     console.log("User has not logged in yet. Redirecting to login...");
     var state = generateRandomString(16);
@@ -161,3 +137,17 @@ async function VerifyTokens(req, res, next) {
     );
   }
 }
+
+function generateRandomString(length) {
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+
+  return result;
+}
+
+module.exports = router;
