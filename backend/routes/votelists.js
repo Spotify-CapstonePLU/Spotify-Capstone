@@ -37,4 +37,19 @@ router.post('/votelists/register', async (req, res) => {
     }
 });
 
+// Get user's Spotify playlists
+router.get('/votelists/playlists', async (req, res) => {
+    // TODO VerifyTokens
+    const access_token = req.cookies.access_token;
+    try {
+        const response = await axios.get(`https://api.spotify.com/v1/me/playlists`, {
+            headers: { Authorization: `Bearer ${access_token}` }
+        })
+        res.json(response.data)
+    } catch (error) {
+        console.error(error);
+        res.status.send("Error requesting user's playlists from Spotify.");
+    }
+})
+
 export default router;
