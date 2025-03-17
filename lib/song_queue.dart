@@ -28,7 +28,6 @@ class _SongQueue extends State<SongQueue> {
               ),
             ),
           ),
-
           for (var itemData in widget.data)
             MediaItem(itemData: itemData)
         ],

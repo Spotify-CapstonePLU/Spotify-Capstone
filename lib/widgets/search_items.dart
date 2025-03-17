@@ -16,7 +16,6 @@ class SearchItems extends StatefulWidget {
 }
 
 class _SearchItemsState extends State<SearchItems> {
-  List<String> songItems = List.generate(50, (index) => 'Song $index');
   List<MediaItemData> mediaItems = [
     const MediaItemData(title: "Song A", details: "Artist A"),
     const MediaItemData(title: "Song B", details: "Artist B"),
@@ -28,21 +27,48 @@ class _SearchItemsState extends State<SearchItems> {
     const MediaItemData(title: "Song H", details: "Artist F"),
     const MediaItemData(title: "Song A", details: "Artist F"),
   ];
-  List<MediaItemData> searchedItems = [];
-
+  List<MediaItemData> allMediaItems = [];
+  List<MediaItemData> filteredItems = [];
   final TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    searchedItems = List.from(mediaItems);
+
+    allMediaItems = [
+      MediaItemData(
+        title: "Song A",
+        details: "Artist X",
+        onTap: () {
+          widget.onMediaItemSelected(const MediaItemData(
+            title: "Song A",
+            details: "Artist X",
+            imageUrl:
+            "https://upload.wikimedia.org/wikipedia/commons/c/c7/Domestic_shorthaired_cat_face.jpg",
+          ));
+          Navigator.pop(context);
+        },
+      ),
+      MediaItemData(
+        title: "Song B",
+        details: "Artist Y",
+        onTap: () {
+          widget.onMediaItemSelected(const MediaItemData(
+            title: "Song B",
+            details: "Artist Y",
+          ));
+          Navigator.pop(context);
+        },
+      ),
+    ];
+    filteredItems = List.from(allMediaItems);
   }
 
   void search(String searchedSong) {
     setState(() {
-      searchedItems = searchedSong.isEmpty
-          ? List.from(mediaItems)
-          : mediaItems
+      filteredItems = searchedSong.isEmpty
+          ? List.from(allMediaItems)
+          : allMediaItems
           .where((item) =>
       item.title.toLowerCase().contains(searchedSong.toLowerCase()))
           .toList();
@@ -71,17 +97,7 @@ class _SearchItemsState extends State<SearchItems> {
               ),
               const SizedBox(height: 10),
               Expanded(
-                child: MediaItemList(
-                  mediaItems: searchedItems
-                      .map((item) => MediaItem(
-                    itemData: item,
-                    onTap: () {
-                      widget.onMediaItemSelected(item);
-                      Navigator.pop(context);
-                    },
-                  ))
-                      .toList(),
-                ),
+                child: MediaItemList(listData: filteredItems),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),

@@ -120,20 +120,20 @@ class _VotingPageState extends State<VotingPage> {
             context: context,
             builder: (BuildContext context) {
               return SearchItems(
-                onMediaItemSelected: (MediaItemData selectedSong){
+                onMediaItemSelected: (MediaItemData selectedMedia) {
                   setState(() {
                     _songCards.insert(
                       0,
                       SongCardData(
-                        songName: selectedSong.title,
-                        artistName: selectedSong.details,
+                        songName: selectedMedia.title,
+                        artistName: selectedMedia.details,
                         trackArt: Image.network('assets/trackArtPlaceholder.png'),
-                        votes: [0, 0], // Placeholder art
+                        votes: [0, 0],
                       ),
                     );
                   });
                 },
-              ); // Show the SearchItems widget as a dialog
+              );
             },
           );
         },
