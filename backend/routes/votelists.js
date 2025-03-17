@@ -32,6 +32,10 @@ router.get('/votelists', async (req, res) => {
 router.post('/votelists/register', async (req, res) => {
     // TODO VerifyTokens
     const { id, name } = req.body;
+    registerVotelist(id, name);
+});
+
+async function registerVotelist(id, name) {
     try {
         const result = await pool.query(
             'INSERT INTO Votelist (playlist_id, name) VALUES ($1, $2) RETURNING *',
@@ -40,9 +44,9 @@ router.post('/votelists/register', async (req, res) => {
         res.json(result.rows[0]);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error adding votelist');
+        res.status(500).send('Error registering votelist');
     }
-});
+}
 
 // Get user's Spotify playlists
 router.get('/votelists/playlists', async (req, res) => {
