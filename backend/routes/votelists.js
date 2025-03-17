@@ -21,5 +21,20 @@ router.get('/votelists', async (req, res) => {
         res.status(500).send('Server error');
     }
 });
+// Register an existing playlist as a votelist
+router.post('/votelists/register', async (req, res) => {
+    // TODO VerifyTokens
+    const { id, name } = req.body;
+    try {
+        const result = await pool.query(
+            'INSERT INTO Votelist (playlist_id, name) VALUES ($1, $2) RETURNING *',
+            [id, name]
+        );
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error adding votelist');
+    }
+});
 
 export default router;
