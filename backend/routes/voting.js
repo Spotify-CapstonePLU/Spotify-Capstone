@@ -46,4 +46,22 @@ router.post('/voting', async (req, res) => {
     }
 });
 
+// Search songs on Spotify
+router.post('/voting/spotify/:query', async (req, res) => {
+    // TODO VerifyTokens
+    const access_token = req.cookies.access_token
+    const { query } = req.params
+    try {
+        const response = await axios.get(`https://api.spotify.com/v1/search?q=${query}&type=track`, {
+            headers: { Authorization: `Bearer ${access_token}` }
+        });
+        
+        res.json(response.data);
+    } catch (error) {
+        console.error(error);
+        res.status.send('Error requesting from Spotify.');
+    }
+
+})
+
 export default router;
