@@ -28,6 +28,48 @@ router.get('/votelists', async (req, res) => {
         res.status(500).send('Server error');
     }
 });
+
+// Create a new Spotify playlist
+router.post('/votelists/create', async (req, res) => {
+    // Create a new Spotify playlist
+    // Register the new votelist
+    const { name } = req.body;
+    var user_id;
+    try { // Retrieve user's id
+        const response = await axios.get('https://api.spotify.com/v1/me', {
+            headers: { Authorization: `Bearer ${access_token}` }
+        });
+        user_id = await response.data.id;
+        console.log("user_id:" + user_id);
+    } catch(error) {
+        console.error(error);
+        res.status(500).send("Failed to retrieve user's id.");
+    }
+
+    try { // Get response from playlist creation
+        const response = await axios.post(`https://api.spotify.com/v1/users/${user_id}/playlists`, {
+            "name": name,
+            "public": true,
+            "collaborative": false
+        }, {
+            headers: { Authorization: `Bearer ${access_token}` }
+        });
+        
+        try { // Use playlist id in response to register as votelist.
+            const result = registerVotelist(await response.data.id, name);
+            res.json(result.rows[0]);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error registering votelist');
+        }
+
+    } catch(error) {
+        console.error(error)
+        res.status(500).send("Failed to create Spotify playlist.")
+    }
+
+})
+
 // Register an existing playlist as a votelist
 router.post('/votelists/register', async (req, res) => {
     // TODO VerifyTokens
