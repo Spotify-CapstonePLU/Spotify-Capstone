@@ -84,7 +84,7 @@ router.get("/callback", async (req, res) => {
   res.send("User has been authenticated!");
 });
 
-async function VerifyTokens(req, res, next) {
+export async function VerifyTokens(req, res, next) {
   const access_token = req.cookies.access_token;
   if (access_token) {
     console.log("Access token found!");
