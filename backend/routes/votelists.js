@@ -2,6 +2,8 @@ import cookieParser from 'cookie-parser';
 import { Router } from 'express';
 import { Pool } from 'pg';
 
+require("dotenv").config
+
 const router = Router();
 const pool = new Pool({ connectionString: process.env.DB_HOST, ssl: { rejectUnauthorized: false } });
 
