@@ -17,6 +17,13 @@ class VotingPage extends StatefulWidget {
 class _VotingPageState extends State<VotingPage> {
   final List<SongCardData> _songCards = [];
 
+  List<MediaItemData> get mediaItems => _songCards.map((song) =>
+      MediaItemData(
+        title: song.songName,
+        details: song.artistName,
+      )
+  ).toList();
+
   void _addSong() {
     setState(() {
       _songCards.insert(
@@ -118,15 +125,20 @@ class _VotingPageState extends State<VotingPage> {
                         context: context,
                         builder: (BuildContext context) {
                           return SortSongs(
-                            songCards: _songCards,
-                            onSongSelected: (selectedIndex) {
-                              setState(() {
-                                // Move selected song to front
-                                var selectedCard = _songCards.removeAt(selectedIndex);
-                                _songCards.add(selectedCard);
-                              });
-                              Navigator.pop(context); // Close dialog
-                            },
+                            mediaItems: _songCards.map((songCardData) {
+                              return MediaItemData(
+                                title: songCardData.songName,
+                                details: songCardData.artistName,
+                                imageUrl: "https://th.bing.com/th/id/R.e78f8e7c326d3e7cdcf053d58f494542?rik=bXopo7rm0XIdFQ&riu=http%3a%2f%2fupload.wikimedia.org%2fwikipedia%2fcommons%2fc%2fc7%2fDomestic_shorthaired_cat_face.jpg&ehk=NByReFekRNa%2fCe0v9gNPEb0tpYmVhy4kI5uaC1l1AUI%3d&risl=1&pid=ImgRaw&r=0",
+                                onTap: () {
+                                  setState(() {
+                                    _songCards.remove(songCardData);
+                                    _songCards.add(songCardData);
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              );
+                            }).toList(),
                           );
                         },
                       );
