@@ -4,6 +4,8 @@ import 'package:spotify_polls/widgets/song_cards.dart';
 import 'package:spotify_polls/widgets/media_items.dart';
 import 'package:spotify_polls/widgets/search_items.dart';
 
+import '../widgets/sort_songs.dart';
+
 class VotingPage extends StatefulWidget {
   const VotingPage({super.key, this.title = "Voting Page"});
   final String title;
@@ -109,7 +111,28 @@ class _VotingPageState extends State<VotingPage> {
                         },
                       ),
                     ],
-                  )
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return SortSongs(
+                            songCards: _songCards,
+                            onSongSelected: (selectedIndex) {
+                              setState(() {
+                                // Move selected song to front
+                                var selectedCard = _songCards.removeAt(selectedIndex);
+                                _songCards.add(selectedCard);
+                              });
+                              Navigator.pop(context); // Close dialog
+                            },
+                          );
+                        },
+                      );
+                    },
+                    child: const Text("Sort Songs"),
+                  ),
                 ]),
           ),
         ],
