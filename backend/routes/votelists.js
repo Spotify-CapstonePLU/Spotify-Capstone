@@ -10,7 +10,14 @@ const { Pool } = pg;
 dotenv.config();
 
 const router = Router();
-const pool = new Pool({ connectionString: process.env.DB_HOST, ssl: { rejectUnauthorized: false } });
+const pool = new Pool({ 
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER, 
+    port: process.env.DB_PORT,
+    password: process.env.DB_PASSWORD,
+    database: "postgres",
+    ssl: { rejectUnauthorized: false } 
+});
 
 router.use(cookieParser());
 
