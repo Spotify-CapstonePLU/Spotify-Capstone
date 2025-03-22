@@ -1,5 +1,5 @@
-const express = require("express");
-const authRoutes = require("./routes/auth");
+import express from "express";
+import authRoutes from "./routes/auth.js";
 const app = express();
 const PORT = 3000;
 
