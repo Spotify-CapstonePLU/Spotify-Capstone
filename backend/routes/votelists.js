@@ -117,7 +117,7 @@ async function registerVotelist(id, name) {
 }
 
 // Get user's Spotify playlists
-router.get('/votelists/playlists', async (req, res) => {
+router.get('/playlists', VerifyTokens, async (req, res) => {
     // TODO VerifyTokens
     const access_token = req.cookies.access_token;
     try {
@@ -127,7 +127,7 @@ router.get('/votelists/playlists', async (req, res) => {
         res.json(response.data)
     } catch (error) {
         console.error(error);
-        res.status.send("Error requesting user's playlists from Spotify.");
+        return res.status(500).send("Error requesting user's playlists from Spotify.");
     }
 })
 
