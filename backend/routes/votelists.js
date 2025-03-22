@@ -22,22 +22,36 @@ const pool = new Pool({
 router.use(cookieParser());
 
 // Get all user's votelists
-router.get('/votelists', async (req, res) => {
-    // TODO VerifyTokens
-    // TODO get user id from spotify
-    const { id } = req.params;
+router.get('/', VerifyTokens, async (req, res) => {
+    let user_id;
+    try { // Retrieve user's id
+        user_id = await getUserID(req.cookies.access_token);
+        console.log("user_id:" + user_id);
+    } catch(error) {
+        console.error(error);
+        return res.status(500).send("Failed to retrieve user's id.");
+    }
+    
     try {
-        const result = await pool.query(`SELECT Votelist.* FROM Votelist
-                                         JOIN Collaborators ON Collaborators.playlist_id = Votelist.playlist_id
+        console.log("connect")
+        const result = await pool.query(`SELECT Votelists.* FROM Votelists
+                                         JOIN Collaborators ON Collaborators.playlist_id = Votelists.playlist_id
                                          WHERE Collaborators.user_id = $1`,
-            [id]
+            [user_id]
         );
         res.json(result.rows);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Server error');
+        return res.status(500).send('Server error getting votelists');
     }
 });
+
+async function getUserID(access_token) {
+    const response = await axios.get('https://api.spotify.com/v1/me', {
+        headers: { Authorization: `Bearer ${access_token}` }
+    });
+    return response.data.id;
+}
 
 // Create a new Spotify playlist
 router.post('/votelists/create', async (req, res) => {
