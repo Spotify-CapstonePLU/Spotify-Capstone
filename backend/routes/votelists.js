@@ -1,11 +1,14 @@
 import cookieParser from 'cookie-parser';
 import { Router } from 'express';
-import { Pool } from 'pg';
-import { Axios } from 'axios';
+import pg from 'pg';
+import axios from 'axios';
+import { VerifyTokens } from './auth.js';
+import dotenv from 'dotenv';
 
-require("dotenv").config
+const { Pool } = pg;
 
-const axios = new Axios();
+dotenv.config();
+
 const router = Router();
 const pool = new Pool({ connectionString: process.env.DB_HOST, ssl: { rejectUnauthorized: false } });
 
