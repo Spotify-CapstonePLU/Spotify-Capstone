@@ -23,7 +23,7 @@ router.get('/voting/:playlist_id', async (req, res) => {
 });
 
 // Update a poll's votes
-router.post('/voting', async (req, res) => {
+router.patch('/voting', async (req, res) => {
     // TODO VerifyTokens
     const { poll_id, vote } = req.body;
     try {
