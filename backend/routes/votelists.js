@@ -96,15 +96,15 @@ router.post('/create', VerifyTokens, async (req, res) => {
 })
 
 // Register an existing playlist as a votelist
-router.post('/votelists/register', async (req, res) => {
+router.post('/register', VerifyTokens, async (req, res) => {
     // TODO VerifyTokens
     const { id, name } = req.body;
     try {
-        const result = registerVotelist(id, name);
+        const result = await registerVotelist(id, name);
         res.json(result.rows[0]);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error registering votelist');
+        return res.status(500).send('Error registering votelist');
     }
 });
 
@@ -113,7 +113,7 @@ async function registerVotelist(id, name) {
         'INSERT INTO Votelist (playlist_id, name) VALUES ($1, $2) RETURNING *',
         [id, name]
     );
-    return result
+    return result.rows[0];
 }
 
 // Get user's Spotify playlists
