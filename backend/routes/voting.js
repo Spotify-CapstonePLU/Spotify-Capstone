@@ -7,7 +7,7 @@ const router = Router();
 const pool = new Pool({ connectionString: process.env.DB_HOST, ssl: { rejectUnauthorized: false } });
 
 // Get all polls for votelist
-router.get('/voting/:playlist_id', async (req, res) => {
+router.get('/:playlist_id', async (req, res) => {
     // TODO VerifyTokens
     const { playlist_id } = req.params;
     try {
@@ -23,7 +23,7 @@ router.get('/voting/:playlist_id', async (req, res) => {
 });
 
 // Update a poll's votes
-router.patch('/voting', async (req, res) => {
+router.patch('/', async (req, res) => {
     // TODO VerifyTokens
     const { poll_id, vote } = req.body;
     try {
@@ -47,7 +47,7 @@ router.patch('/voting', async (req, res) => {
 });
 
 // Search songs on Spotify
-router.post('/voting/spotify/:query', async (req, res) => {
+router.post('/spotify/:query', async (req, res) => {
     // TODO VerifyTokens
     const access_token = req.cookies.access_token
     const { query } = req.params
