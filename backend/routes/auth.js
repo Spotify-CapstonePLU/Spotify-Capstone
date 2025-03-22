@@ -1,11 +1,13 @@
-const express = require("express");
-const axios = require("axios");
-const querystring = require("querystring");
-const cookieParser = require("cookie-parser");
+import express from "express";
+import axios from "axios";
+import querystring from 'querystring'
+import cookieParser from "cookie-parser";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const router = express.Router();
 
-require("dotenv").config();
 router.use(cookieParser());
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
@@ -150,4 +152,4 @@ function generateRandomString(length) {
   return result;
 }
 
-module.exports = router;
+export default router;
