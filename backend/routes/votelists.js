@@ -23,6 +23,18 @@ router.use(cookieParser());
 
 // Get all user's votelists
 router.get('/', VerifyTokens, async (req, res) => {
+    try {
+        console.log("before bruh")
+        const client = await pool.connect();
+        console.log("after connect");
+        const test = await pool.query("SELECT NOW()");
+        console.log(await test.rows[0])
+        console.log("bruh")
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("Server error.");
+    }
+
     let user_id;
     try { // Retrieve user's id
         user_id = await getUserID(req.cookies.access_token);
@@ -34,11 +46,13 @@ router.get('/', VerifyTokens, async (req, res) => {
     
     try {
         console.log("connect")
-        const result = await pool.query(`SELECT Votelists.* FROM Votelists
-                                         JOIN Collaborators ON Collaborators.playlist_id = Votelists.playlist_id
-                                         WHERE Collaborators.user_id = $1`,
-            [user_id]
-        );
+        const result = await pool.query("SELECT * from Votelists")
+        // const result = await pool.query(`SELECT Votelists.* FROM Votelists
+        //                                  JOIN Collaborators ON Collaborators.playlist_id = Votelists.playlist_id
+        //                                  WHERE Collaborators.user_id = $1`,
+        //     [user_id]
+        // );
+        console.log(result.rows)
         res.json(result.rows);
     } catch (error) {
         console.error(error);
