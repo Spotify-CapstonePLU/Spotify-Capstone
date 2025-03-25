@@ -1,8 +1,12 @@
 import express from "express";
+import bodyParser from "body-parser";
 import authRoutes from "./routes/auth.js";
 import votelistRoutes from "./routes/votelists.js"
 const app = express();
 const PORT = 3000;
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 
 app.get("/", (req, res) => {
   res.send("Backend server for Spotify App is running!");

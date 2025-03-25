@@ -23,18 +23,6 @@ router.use(cookieParser());
 
 // Get all user's votelists
 router.get('/', VerifyTokens, async (req, res) => {
-    try {
-        console.log("before bruh")
-        const client = await pool.connect();
-        console.log("after connect");
-        const test = await pool.query("SELECT NOW()");
-        console.log(await test.rows[0])
-        console.log("bruh")
-    } catch (error) {
-        console.error(error);
-        return res.status(500).send("Server error.");
-    }
-
     let user_id;
     try { // Retrieve user's id
         user_id = await getUserID(req.cookies.access_token);
@@ -45,13 +33,12 @@ router.get('/', VerifyTokens, async (req, res) => {
     }
     
     try {
-        console.log("connect")
-        const result = await pool.query("SELECT * from Votelists")
-        // const result = await pool.query(`SELECT Votelists.* FROM Votelists
-        //                                  JOIN Collaborators ON Collaborators.playlist_id = Votelists.playlist_id
-        //                                  WHERE Collaborators.user_id = $1`,
-        //     [user_id]
-        // );
+        console.log("attempt connection")
+        const result = await pool.query(`SELECT Votelists.* FROM Votelists
+                                         JOIN Collaborators ON Collaborators.playlist_id = Votelists.playlist_id
+                                         WHERE Collaborators.user_id = $1`,
+            [user_id]
+        );
         console.log(result.rows)
         res.json(result.rows);
     } catch (error) {
@@ -93,6 +80,8 @@ router.post('/create', VerifyTokens, async (req, res) => {
         }, {
             headers: { Authorization: `Bearer ${access_token}` }
         });
+
+        console.log(await response.data.id)
         
         try { // Use playlist id in response to register as votelist.
             const result = await registerVotelist(await response.data.id, name);
@@ -124,7 +113,7 @@ router.post('/register', VerifyTokens, async (req, res) => {
 
 async function registerVotelist(id, name) {
     const result = await pool.query(
-        'INSERT INTO Votelist (playlist_id, name) VALUES ($1, $2) RETURNING *',
+        'INSERT INTO Votelists (playlist_id, playlist_name) VALUES ($1, $2) RETURNING *',
         [id, name]
     );
     return result.rows[0];
