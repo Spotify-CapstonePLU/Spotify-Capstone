@@ -33,6 +33,35 @@ router.get("/", VerifyTokens, (req, res) => {
   res.send(req.cookies);
 });
 
+async function registerUser(access_token) {
+  const spotifyClient = new SpotifyClient(access_token)
+  let userID;
+  let username;
+  try {
+    const response = await spotifyClient.getUserData();
+    userID = await response.id;
+    username = await response.display_name;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get user data from spotify.")
+  }
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO Users (user_id, user_name)
+        VALUES ($1, $2)
+        ON CONFLICT (user_id) DO UPDATE
+        SET user_name = EXCLUDED.user_name
+        RETURNING *;`,
+      [userID, username]
+    );
+    return await result.rows[0]
+  } catch (error) {
+    console.error(error);
+    throw new Error('Server error registering user.')
+  }
+}
+
 router.get("/callback", async (req, res) => {
   var code = req.query.code || null;
   var state = req.query.state || null;
@@ -94,6 +123,15 @@ router.get("/callback", async (req, res) => {
       secure: false, // Set to true when deploying to production
       maxAge: expires_in, // 1 hour before expriring
     });
+
+    try {
+      const result = await registerUser(access_token)
+      // res.json(await result);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send('Server error registering user.');
+    }
+
   }
 
   res.send("User has been authenticated!");
