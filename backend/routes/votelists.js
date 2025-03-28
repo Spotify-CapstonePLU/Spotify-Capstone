@@ -1,14 +1,13 @@
 import cookieParser from 'cookie-parser';
 import { Router } from 'express';
 import pg from 'pg';
-import axios from 'axios';
 import { VerifyTokens } from './auth.js';
 import dotenv from 'dotenv';
-
-const { Pool } = pg;
+import { SpotifyClient } from '../clients/spotify_client.js';
 
 dotenv.config();
 
+const { Pool } = pg;
 const router = Router();
 const pool = new Pool({ 
     host: process.env.DB_HOST,
@@ -23,10 +22,11 @@ router.use(cookieParser());
 
 // Get all user's votelists
 router.get('/', VerifyTokens, async (req, res) => {
-    let user_id;
+    let userID;
+    const spotifyClient = new SpotifyClient(req.cookies.access_token);
     try { // Retrieve user's id
-        user_id = await getUserID(req.cookies.access_token);
-        console.log("user_id:" + user_id);
+        userID = await spotifyClient.getUserData();
+        console.log("userID:" + userID);
     } catch(error) {
         console.error(error);
         return res.status(500).send("Failed to retrieve user's id.");
@@ -37,7 +37,7 @@ router.get('/', VerifyTokens, async (req, res) => {
         const result = await pool.query(`SELECT Votelists.* FROM Votelists
                                          JOIN Collaborators ON Collaborators.playlist_id = Votelists.playlist_id
                                          WHERE Collaborators.user_id = $1`,
-            [user_id]
+            [userID]
         );
         console.log(result.rows)
         res.json(result.rows);
@@ -47,45 +47,39 @@ router.get('/', VerifyTokens, async (req, res) => {
     }
 });
 
-async function getUserID(access_token) {
-    const response = await axios.get('https://api.spotify.com/v1/me', {
-        headers: { Authorization: `Bearer ${access_token}` }
-    });
-    return response.data.id;
-}
+
 
 // Create a new Spotify playlist
 router.post('/create', VerifyTokens, async (req, res) => {
-    // Create a new Spotify playlist
-    // Register the new votelist
     const access_token = req.cookies.access_token;
-    const { name } = req.body;
-    if (!name) {
+    const { playlist_name: playlistName } = req.body;
+    const spotifyClient = new SpotifyClient(access_token);
+
+    if (!playlistName) {
         return res.status(400).send("Playlist name is required.");
     }
-    let user_id;
+
+    let userID;
     try { // Retrieve user's id
-        user_id = await getUserID(access_token);
-        console.log("user_id:" + user_id);
+        userID = await spotifyClient.getUserData().id;
+        console.log("userID:" + userID);
     } catch(error) {
         console.error(error);
         return res.status(500).send("Failed to retrieve user's id.");
     }
 
     try { // Get response from playlist creation
-        const response = await axios.post(`https://api.spotify.com/v1/users/${user_id}/playlists`, {
-            "name": name,
-            "public": true,
-            "collaborative": false
-        }, {
-            headers: { Authorization: `Bearer ${access_token}` }
-        });
+        const playlistData = await spotifyClient.createPlaylist(playlistName, userID);
+        
+        console.log('playlist data:' + await playlistData.id);
 
-        console.log(await response.data.id)
+        if (!playlistData.id) {
+            throw new Error('Missing required field: id.')
+        }
         
         try { // Use playlist id in response to register as votelist.
-            const result = await registerVotelist(await response.data.id, name);
-            res.json(result.rows[0]);
+            const result = await registerVotelist(await playlistData.id, playlistName, userID);
+            res.json(result);
         } catch (error) {
             console.error(error);
             return res.status(500).send('Error registering votelist');
@@ -100,11 +94,21 @@ router.post('/create', VerifyTokens, async (req, res) => {
 
 // Register an existing playlist as a votelist
 router.post('/register', VerifyTokens, async (req, res) => {
-    // TODO VerifyTokens
-    const { id, name } = req.body;
-    try {
-        const result = await registerVotelist(id, name);
-        res.json(result.rows[0]);
+    const access_token = req.cookies.access_token;
+    const spotifyClient = new SpotifyClient(access_token);
+    let userID;
+    try { // Retrieve user's id
+        userID = await spotifyClient.getUserData();
+        console.log("userID:" + userID);
+    } catch(error) {
+        console.error(error);
+        return res.status(500).send("Failed to retrieve user's id.");
+    }
+
+    const { playlist_id: playlistID, playlist_name: playlistName } = req.body;
+    try { //register votelist
+        const result = await registerVotelist(playlistID, playlistName, userID);
+        res.json(result);
     } catch (error) {
         console.error(error);
         return res.status(500).send('Error registering votelist');
@@ -121,13 +125,10 @@ async function registerVotelist(id, name) {
 
 // Get user's Spotify playlists
 router.get('/playlists', VerifyTokens, async (req, res) => {
-    // TODO VerifyTokens
     const access_token = req.cookies.access_token;
+    const spotifyClient = new SpotifyClient(access_token);
     try {
-        const response = await axios.get(`https://api.spotify.com/v1/me/playlists`, {
-            headers: { Authorization: `Bearer ${access_token}` }
-        })
-        res.json(response.data)
+        res.json(spotifyClient.getUserPlaylists())
     } catch (error) {
         console.error(error);
         return res.status(500).send("Error requesting user's playlists from Spotify.");
