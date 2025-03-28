@@ -26,19 +26,14 @@ router.get('/:playlist_id', async (req, res) => {
 router.post('/', VerifyTokens, async (req, res) => {
     // TODO 
     const { poll_id, vote } = req.body;
+    const spotifyClient = new SpotifyClient(req.cookies.access_token);
+    const userID = await spotifyClient.getUserID();
     try {
-        const result = vote ? await pool.query(
-            `UPDATE Poll SET upvotes = upvotes + 1
-             WHERE poll_id = $1
-             RETURNING *`,
-            [poll_id]
-        ) :
-        await pool.query(
-            `UPDATE Poll SET downvotes = downvotes + 1
-             WHERE poll_id = $1
-             RETURNING *`,
-            [poll_id]
-        );
+        const result = await pool.query(
+            `INSERT INTO Votes (poll_id, user_id, vote)
+             VALUES ()`,
+            [userID]
+        )
         res.json(result.rows[0]);
     } catch (error) {
         console.error(error);
