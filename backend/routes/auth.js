@@ -69,17 +69,17 @@ router.get("/callback", async (req, res) => {
   if (code === null) {
     return res.redirect(
       "/#" +
-        querystring.stringify({
-          error: "code_mismatch",
-        })
+      querystring.stringify({
+        error: "code_mismatch",
+      })
     );
   }
   if (state === null) {
     return res.redirect(
       "/#" +
-        querystring.stringify({
-          error: "state_mismatch",
-        })
+      querystring.stringify({
+        error: "state_mismatch",
+      })
     );
   } else {
     let response;
@@ -103,9 +103,9 @@ router.get("/callback", async (req, res) => {
       console.log(error);
       return res.redirect(
         "/#" +
-          querystring.stringify({
-            error: "invalid authorization code",
-          })
+        querystring.stringify({
+          error: "invalid authorization code",
+        })
       );
     }
 
@@ -180,13 +180,13 @@ export async function VerifyTokens(req, res, next) {
 
     res.redirect(
       "https://accounts.spotify.com/authorize?" +
-        querystring.stringify({
-          response_type: "code",
-          client_id: CLIENT_ID,
-          scope: SPOTIFY_SCOPES,
-          redirect_uri: REDIRECT_URI,
-          state: state,
-        })
+      querystring.stringify({
+        response_type: "code",
+        client_id: CLIENT_ID,
+        scope: SPOTIFY_SCOPES,
+        redirect_uri: REDIRECT_URI,
+        state: state,
+      })
     );
   }
 }
