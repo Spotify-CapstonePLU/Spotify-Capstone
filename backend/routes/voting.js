@@ -22,9 +22,9 @@ router.get('/:playlist_id', async (req, res) => {
     }
 });
 
-// Update a poll's votes
-router.patch('/', async (req, res) => {
-    // TODO VerifyTokens
+// Insert/update row in votes table(whenever a vote is made)
+router.post('/', VerifyTokens, async (req, res) => {
+    // TODO 
     const { poll_id, vote } = req.body;
     try {
         const result = vote ? await pool.query(
