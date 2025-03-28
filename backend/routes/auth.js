@@ -3,6 +3,8 @@ import axios from "axios";
 import querystring from 'querystring'
 import cookieParser from "cookie-parser";
 import dotenv from 'dotenv';
+import pg from 'pg'
+import { SpotifyClient } from "../clients/spotify_client.js";
 
 dotenv.config();
 
