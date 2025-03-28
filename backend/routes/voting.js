@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { Pool } from 'pg';
-import { Axios } from 'axios';
+import { SpotifyClient } from '../clients/spotify_client';
+import { VerifyTokens } from './auth';
 
-const axios = new Axios();
 const router = Router();
 const pool = new Pool({ connectionString: process.env.DB_HOST, ssl: { rejectUnauthorized: false } });
 
