@@ -115,12 +115,35 @@ router.post('/register', VerifyTokens, async (req, res) => {
     }
 });
 
-async function registerVotelist(id, name) {
-    const result = await pool.query(
-        'INSERT INTO Votelists (playlist_id, playlist_name) VALUES ($1, $2) RETURNING *',
-        [id, name]
-    );
-    return result.rows[0];
+async function registerVotelist(playlistID, playlistName, userID) {
+    const pgClient = await pool.connect();
+
+    try {
+        await pgClient.query('BEGIN');
+        // Insert into Votelists
+        const votelistResult = await pgClient.query(
+            `INSERT INTO Votelists (playlist_id, playlist_name, owner_id) 
+             VALUES ($1, $2, $3) RETURNING *;`,
+            [playlistID, playlistName, userID]
+        );
+
+        // Insert into Collaborators
+        const collaboratorResult = await pgClient.query(
+            `INSERT INTO Collaborators (playlist_id, user_id) 
+             VALUES ($1, $2) RETURNING *;`,
+            [playlistID, userID]
+        );
+
+        await pgClient.query('COMMIT'); // Commit transaction
+        console.log(votelistResult.rows, collaboratorResult.rows);
+        return { votelist: votelistResult.rows[0], collaborator: collaboratorResult.rows[0] };
+    } catch (error) {
+        await pgClient.query('ROLLBACK'); // Rollback if any error occurs
+        console.error('Error in registerVotelist:', error);
+        throw error;
+    } finally {
+        pgClient.release(); // Release the client back to the pool
+    }
 }
 
 // Get user's Spotify playlists
