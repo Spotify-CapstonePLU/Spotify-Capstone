@@ -8,6 +8,17 @@ import { SpotifyClient } from "../clients/spotify_client.js";
 
 dotenv.config();
 
+const { Pool } = pg;
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  port: process.env.DB_PORT,
+  password: process.env.DB_PASSWORD,
+  database: "postgres",
+  ssl: { rejectUnauthorized: false }
+});
+
+
 const router = express.Router();
 
 router.use(cookieParser());
