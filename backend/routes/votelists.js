@@ -22,11 +22,11 @@ router.use(cookieParser());
 
 // Get all user's votelists
 router.get('/', VerifyTokens, async (req, res) => {
-    let userID;
+    let userId;
     const spotifyClient = new SpotifyClient(req.cookies.access_token);
     try { // Retrieve user's id
-        userID = await spotifyClient.getUserData();
-        console.log("userID:" + userID);
+        userId = await spotifyClient.getUserData();
+        console.log("userId:" + userId);
     } catch(error) {
         console.error(error);
         return res.status(500).send("Failed to retrieve user's id.");
@@ -37,7 +37,7 @@ router.get('/', VerifyTokens, async (req, res) => {
         const result = await pool.query(`SELECT Votelists.* FROM Votelists
                                          JOIN Collaborators ON Collaborators.playlist_id = Votelists.playlist_id
                                          WHERE Collaborators.user_id = $1`,
-            [userID]
+            [userId]
         );
         console.log(result.rows)
         res.json(result.rows);
@@ -59,17 +59,17 @@ router.post('/create', VerifyTokens, async (req, res) => {
         return res.status(400).send("Playlist name is required.");
     }
 
-    let userID;
+    let userId;
     try { // Retrieve user's id
-        userID = await spotifyClient.getUserData().id;
-        console.log("userID:" + userID);
+        userId = await spotifyClient.getUserData().id;
+        console.log("userId:" + userId);
     } catch(error) {
         console.error(error);
         return res.status(500).send("Failed to retrieve user's id.");
     }
 
     try { // Get response from playlist creation
-        const playlistData = await spotifyClient.createPlaylist(playlistName, userID);
+        const playlistData = await spotifyClient.createPlaylist(playlistName, userId);
         
         console.log('playlist data:' + await playlistData.id);
 
@@ -78,7 +78,7 @@ router.post('/create', VerifyTokens, async (req, res) => {
         }
         
         try { // Use playlist id in response to register as votelist.
-            const result = await registerVotelist(await playlistData.id, playlistName, userID);
+            const result = await registerVotelist(await playlistData.id, playlistName, userId);
             res.json(result);
         } catch (error) {
             console.error(error);
@@ -96,10 +96,10 @@ router.post('/create', VerifyTokens, async (req, res) => {
 router.post('/register', VerifyTokens, async (req, res) => {
     const access_token = req.cookies.access_token;
     const spotifyClient = new SpotifyClient(access_token);
-    let userID;
+    let userId;
     try { // Retrieve user's id
-        userID = await spotifyClient.getUserData();
-        console.log("userID:" + userID);
+        userId = await spotifyClient.getUserData();
+        console.log("userId:" + userId);
     } catch(error) {
         console.error(error);
         return res.status(500).send("Failed to retrieve user's id.");
@@ -107,7 +107,7 @@ router.post('/register', VerifyTokens, async (req, res) => {
 
     const { playlist_id: playlistID, playlist_name: playlistName } = req.body;
     try { //register votelist
-        const result = await registerVotelist(playlistID, playlistName, userID);
+        const result = await registerVotelist(playlistID, playlistName, userId);
         res.json(result);
     } catch (error) {
         console.error(error);
@@ -115,7 +115,7 @@ router.post('/register', VerifyTokens, async (req, res) => {
     }
 });
 
-async function registerVotelist(playlistID, playlistName, userID) {
+async function registerVotelist(playlistID, playlistName, userId) {
     const pgClient = await pool.connect();
 
     try {
@@ -124,14 +124,14 @@ async function registerVotelist(playlistID, playlistName, userID) {
         const votelistResult = await pgClient.query(
             `INSERT INTO Votelists (playlist_id, playlist_name, owner_id) 
              VALUES ($1, $2, $3) RETURNING *;`,
-            [playlistID, playlistName, userID]
+            [playlistID, playlistName, userId]
         );
 
         // Insert into Collaborators
         const collaboratorResult = await pgClient.query(
             `INSERT INTO Collaborators (playlist_id, user_id) 
              VALUES ($1, $2) RETURNING *;`,
-            [playlistID, userID]
+            [playlistID, userId]
         );
 
         await pgClient.query('COMMIT'); // Commit transaction

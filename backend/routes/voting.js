@@ -25,14 +25,16 @@ router.get('/:playlist_id', async (req, res) => {
 // Insert/update row in votes table(whenever a vote is made)
 router.post('/', VerifyTokens, async (req, res) => {
     // TODO 
-    const { poll_id, vote } = req.body;
+    const { poll_id : pollId, vote } = req.body;
     const spotifyClient = new SpotifyClient(req.cookies.access_token);
-    const userID = await spotifyClient.getUserID();
+    const userId = await spotifyClient.getUserData();
     try {
         const result = await pool.query(
-            `INSERT INTO Votes (poll_id, user_id, vote)
-             VALUES ()`,
-            [userID]
+            `INSERT INTO votes(poll_id, user_id, vote)
+             VALUES ($1, $2, $3)
+             ON CONFLICT (poll_id, user_id) DO UPDATE
+             SET vote = EXCLUDED.vote`,
+            [pollId, userId, vote]
         )
         res.json(result.rows[0]);
     } catch (error) {
