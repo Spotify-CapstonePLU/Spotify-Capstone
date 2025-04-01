@@ -31,7 +31,7 @@ class _VotingPageState extends State<VotingPage> {
           SongCardData(
             songName: "Song ${_songCards.length + 1}",
             artistName: "Artist ${_songCards.length + 1}",
-            trackArt: Image.network('assets/trackArtPlaceholder.png'),
+            trackArt: "assets/trackArtPlaceholder.png",
             votes: [0, 0], // Placeholder art
           ));
     });
@@ -129,7 +129,7 @@ class _VotingPageState extends State<VotingPage> {
                               return MediaItemData(
                                 title: songCardData.songName,
                                 details: songCardData.artistName,
-                                imageUrl: "https://th.bing.com/th/id/R.e78f8e7c326d3e7cdcf053d58f494542?rik=bXopo7rm0XIdFQ&riu=http%3a%2f%2fupload.wikimedia.org%2fwikipedia%2fcommons%2fc%2fc7%2fDomestic_shorthaired_cat_face.jpg&ehk=NByReFekRNa%2fCe0v9gNPEb0tpYmVhy4kI5uaC1l1AUI%3d&risl=1&pid=ImgRaw&r=0",
+                                imageUrl: "assets/trackArtPlaceholder.png",
                                 onTap: () {
                                   setState(() {
                                     _songCards.remove(songCardData);
@@ -162,7 +162,7 @@ class _VotingPageState extends State<VotingPage> {
                       SongCardData(
                         songName: selectedMedia.title,
                         artistName: selectedMedia.details,
-                        trackArt: Image.network('assets/trackArtPlaceholder.png'),
+                        trackArt: "assets/trackArtPlaceholder.png",
                         votes: [0, 0],
                       ),
                     );
