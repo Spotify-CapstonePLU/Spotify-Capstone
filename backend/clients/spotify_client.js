@@ -11,9 +11,9 @@ export class SpotifyClient {
         });
     }
 
-    async createPlaylist(playlist_name, userID) {
+    async createPlaylist(playlist_name, userId) {
         try {
-            const response = await this.api.post(`/users/${userID}/playlists`, {
+            const response = await this.api.post(`/users/${userId}/playlists`, {
                 "name": playlist_name,
                 "public": true,
                 "collaborative": false
