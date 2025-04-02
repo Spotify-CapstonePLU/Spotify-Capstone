@@ -25,7 +25,7 @@ router.get('/', VerifyTokens, async (req, res) => {
     let userId;
     const spotifyClient = new SpotifyClient(req.cookies.access_token);
     try { // Retrieve user's id
-        userId = await spotifyClient.getUserData();
+        userId = await spotifyClient.getUserData().id;
         console.log("userId:" + userId);
     } catch(error) {
         console.error(error);
@@ -63,6 +63,9 @@ router.post('/create', VerifyTokens, async (req, res) => {
     try { // Retrieve user's id
         userId = await spotifyClient.getUserData().id;
         console.log("userId:" + userId);
+        if (!userId) {
+            throw new Error("userId is undefined.")
+        }
     } catch(error) {
         console.error(error);
         return res.status(500).send("Failed to retrieve user's id.");
@@ -98,7 +101,7 @@ router.post('/register', VerifyTokens, async (req, res) => {
     const spotifyClient = new SpotifyClient(access_token);
     let userId;
     try { // Retrieve user's id
-        userId = await spotifyClient.getUserData();
+        userId = await spotifyClient.getUserData().id;
         console.log("userId:" + userId);
     } catch(error) {
         console.error(error);
@@ -151,7 +154,7 @@ router.get('/playlists', VerifyTokens, async (req, res) => {
     const access_token = req.cookies.access_token;
     const spotifyClient = new SpotifyClient(access_token);
     try {
-        res.json(spotifyClient.getUserPlaylists())
+        res.json(await spotifyClient.getUserPlaylists())
     } catch (error) {
         console.error(error);
         return res.status(500).send("Error requesting user's playlists from Spotify.");
