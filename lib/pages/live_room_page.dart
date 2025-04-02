@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spotify_polls/widgets/control_bar.dart';
 import 'package:spotify_polls/widgets/song_cards.dart';
 import 'package:spotify_polls/widgets/custom_app_bar.dart';
-import 'package:spotify_polls/widgets/song_queue.dart';
+import 'package:spotify_polls/widgets/song_drawer.dart';
 import 'package:spotify_polls/widgets/media_items.dart';
 import 'package:spotify_polls/widgets/voting.dart';
 
@@ -57,7 +57,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
     }
 
     return Scaffold(
-      endDrawer: SongQueue(data: liveQueueData),
+      endDrawer: SongDrawer(data: liveQueueData),
       appBar: CustomAppBar(title: widget.title),
         body: Stack(
           children: [
