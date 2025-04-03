@@ -1,10 +1,20 @@
 import { Router } from 'express';
-import { Pool } from 'pg';
-import { SpotifyClient } from '../clients/spotify_client';
-import { VerifyTokens } from './auth';
+import cookieParser from 'cookie-parser';
+import pg from 'pg';
+import { SpotifyClient } from '../clients/spotify_client.js';
+import { VerifyTokens } from './auth.js';
 
+const { Pool } = pg;
 const router = Router();
-const pool = new Pool({ connectionString: process.env.DB_HOST, ssl: { rejectUnauthorized: false } });
+const pool = new Pool({ 
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER, 
+    port: process.env.DB_PORT,
+    password: process.env.DB_PASSWORD,
+    database: "postgres",
+    ssl: { rejectUnauthorized: false } 
+});
+router.use(cookieParser())
 
 // Get all polls for votelist
 router.get('/:playlist_id', async (req, res) => {
