@@ -57,10 +57,10 @@ router.post('/', VerifyTokens, async (req, res) => {
 router.get('/search/:song', VerifyTokens, async (req, res) => {
     // TODO VerifyTokens
     const access_token = req.cookies.access_token
-    const { query } = req.params
+    const { song } = req.params
     const spotifyClient = new SpotifyClient(access_token);
     try {        
-        res.json(await spotifyClient.searchSongs(query));
+        res.json(await spotifyClient.searchSongs(song));
     } catch (error) {
         console.error(error);
         res.status.send('Error requesting from Spotify.');
