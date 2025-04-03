@@ -25,8 +25,12 @@ router.get('/', VerifyTokens, async (req, res) => {
     let userId;
     const spotifyClient = new SpotifyClient(req.cookies.access_token);
     try { // Retrieve user's id
-        userId = await spotifyClient.getUserData().id;
-        console.log("userId:" + userId);
+        const userData = await spotifyClient.getUserData();
+        userId = userData.id;
+        console.log("/ route, userId:" + userId);
+        if (!userId) {
+            throw new Error("userId is undefined.")
+        }
     } catch(error) {
         console.error(error);
         return res.status(500).send("Failed to retrieve user's id.");
@@ -61,8 +65,9 @@ router.post('/create', VerifyTokens, async (req, res) => {
 
     let userId;
     try { // Retrieve user's id
-        userId = await spotifyClient.getUserData().id;
-        console.log("userId:" + userId);
+        const userData = await spotifyClient.getUserData();
+        userId = userData.id;
+        console.log("/create route, userId:" + userId);
         if (!userId) {
             throw new Error("userId is undefined.")
         }
@@ -101,8 +106,9 @@ router.post('/register', VerifyTokens, async (req, res) => {
     const spotifyClient = new SpotifyClient(access_token);
     let userId;
     try { // Retrieve user's id
-        userId = await spotifyClient.getUserData().id;
-        console.log("userId:" + userId);
+        const userData = await spotifyClient.getUserData();
+        userId = userData.id;
+        console.log("/register route, userId:" + userId);
     } catch(error) {
         console.error(error);
         return res.status(500).send("Failed to retrieve user's id.");
