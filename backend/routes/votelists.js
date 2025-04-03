@@ -38,9 +38,13 @@ router.get('/', VerifyTokens, async (req, res) => {
     
     try {
         console.log("attempt connection")
-        const result = await pool.query(`SELECT Votelists.* FROM Votelists
-                                         JOIN Collaborators ON Collaborators.playlist_id = Votelists.playlist_id
-                                         WHERE Collaborators.user_id = $1`,
+        const result = await pool.query(`
+            SELECT * FROM Votelists
+            WHERE owner_id = $1
+            UNION
+            SELECT Votelists.* FROM Votelists
+            JOIN Collaborators ON Collaborators.playlist_id = Votelists.playlist_id
+            WHERE Collaborators.user_id = $1`,
             [userId]
         );
         console.log(result.rows)
