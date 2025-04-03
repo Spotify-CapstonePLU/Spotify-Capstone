@@ -83,7 +83,7 @@ class ButtonSection extends StatelessWidget {
           TextButton(
               onPressed: () {
                 log("clicked Sign In");
-                ApiService.getSpotifyAuthorization();
+                ApiService.getSpotifyAuthorization(context);
               },
               child: const Text(constants.signIn)),
           TextButton(
