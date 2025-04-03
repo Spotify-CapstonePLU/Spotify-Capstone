@@ -17,7 +17,7 @@ const pool = new Pool({
 router.use(cookieParser())
 
 // Get all polls for votelist
-router.get('/:playlist_id', async (req, res) => {
+router.get('/polls/:playlist_id', VerifyTokens, async (req, res) => {
     // TODO VerifyTokens
     const { playlist_id } = req.params;
     try {
