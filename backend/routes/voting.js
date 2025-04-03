@@ -1,13 +1,23 @@
 import { Router } from 'express';
-import { Pool } from 'pg';
-import { SpotifyClient } from '../clients/spotify_client';
-import { VerifyTokens } from './auth';
+import cookieParser from 'cookie-parser';
+import pg from 'pg';
+import { SpotifyClient } from '../clients/spotify_client.js';
+import { VerifyTokens } from './auth.js';
 
+const { Pool } = pg;
 const router = Router();
-const pool = new Pool({ connectionString: process.env.DB_HOST, ssl: { rejectUnauthorized: false } });
+const pool = new Pool({ 
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER, 
+    port: process.env.DB_PORT,
+    password: process.env.DB_PASSWORD,
+    database: "postgres",
+    ssl: { rejectUnauthorized: false } 
+});
+router.use(cookieParser())
 
 // Get all polls for votelist
-router.get('/:playlist_id', async (req, res) => {
+router.get('/polls/:playlist_id', VerifyTokens, async (req, res) => {
     // TODO VerifyTokens
     const { playlist_id } = req.params;
     try {
@@ -25,14 +35,16 @@ router.get('/:playlist_id', async (req, res) => {
 // Insert/update row in votes table(whenever a vote is made)
 router.post('/', VerifyTokens, async (req, res) => {
     // TODO 
-    const { poll_id, vote } = req.body;
+    const { poll_id : pollId, vote } = req.body;
     const spotifyClient = new SpotifyClient(req.cookies.access_token);
-    const userID = await spotifyClient.getUserID();
+    const userId = await spotifyClient.getUserData();
     try {
         const result = await pool.query(
-            `INSERT INTO Votes (poll_id, user_id, vote)
-             VALUES ()`,
-            [userID]
+            `INSERT INTO Votes(poll_id, user_id, vote)
+             VALUES ($1, $2, $3)
+             ON CONFLICT (poll_id, user_id) DO UPDATE
+             SET vote = EXCLUDED.vote`,
+            [pollId, userId, vote]
         )
         res.json(result.rows[0]);
     } catch (error) {
@@ -42,13 +54,13 @@ router.post('/', VerifyTokens, async (req, res) => {
 });
 
 // Search songs on Spotify
-router.post('/songs/:query', VerifyTokens, async (req, res) => {
+router.get('/search/:song', VerifyTokens, async (req, res) => {
     // TODO VerifyTokens
     const access_token = req.cookies.access_token
-    const { query } = req.params
+    const { song } = req.params
     const spotifyClient = new SpotifyClient(access_token);
     try {        
-        res.json(await spotifyClient.searchSongs(query));
+        res.json(await spotifyClient.searchSongs(song));
     } catch (error) {
         console.error(error);
         res.status.send('Error requesting from Spotify.');

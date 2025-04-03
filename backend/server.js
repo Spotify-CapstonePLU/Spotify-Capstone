@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import authRoutes from "./routes/auth.js";
 import votelistRoutes from "./routes/votelists.js"
+import votingRoutes from "./routes/voting.js"
 const app = express();
 const PORT = 3000;
 
@@ -14,6 +15,7 @@ app.get("/", (req, res) => {
 
 app.use('/auth', authRoutes)
 app.use('/votelists', votelistRoutes)
+app.use('/voting', votingRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://127.0.0.1:${PORT}`);
