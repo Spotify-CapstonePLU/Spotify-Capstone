@@ -18,7 +18,6 @@ export class SpotifyClient {
                 "public": true,
                 "collaborative": false
             })
-            // console.log(await response.data)
             return await response.data
         } catch (error) {
             console.error('Error creating playlist:', error.response?.data || error.message);
@@ -26,7 +25,7 @@ export class SpotifyClient {
         }
     }
 
-    // Method to search for songs
+    // Search for songs
     async searchSongs(query) {
         try {
             const response = await this.api.get('/search', {
@@ -50,7 +49,7 @@ export class SpotifyClient {
         }
     }
 
-    // Method to get the authenticated user's playlists
+    // Get user's playlists
     async getUserPlaylists() {
         try {
             const response = await this.api.get('/me/playlists');
