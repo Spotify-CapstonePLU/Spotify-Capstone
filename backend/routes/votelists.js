@@ -118,10 +118,9 @@ router.post('/register', VerifyTokens, async (req, res) => {
         return res.status(500).send("Failed to retrieve user's id.");
     }
 
-    const { playlist_id: playlistID, playlist_name: playlistName } = req.body;
+    const { playlist_id: playlistId, playlist_name: playlistName } = req.body;
     try { //register votelist
-        const result = await registerVotelist(playlistID, playlistName, userId);
-        res.json(result);
+        const result = await registerVotelist(playlistId, playlistName, userId);
     } catch (error) {
         console.error(error);
         return res.status(500).send('Error registering votelist');
