@@ -54,7 +54,7 @@ router.post('/', VerifyTokens, async (req, res) => {
 });
 
 // Search songs on Spotify
-router.post('/songs/:query', VerifyTokens, async (req, res) => {
+router.get('/search/:song', VerifyTokens, async (req, res) => {
     // TODO VerifyTokens
     const access_token = req.cookies.access_token
     const { query } = req.params
