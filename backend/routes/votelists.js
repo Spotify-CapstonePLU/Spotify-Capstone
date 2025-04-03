@@ -38,9 +38,13 @@ router.get('/', VerifyTokens, async (req, res) => {
     
     try {
         console.log("attempt connection")
-        const result = await pool.query(`SELECT Votelists.* FROM Votelists
-                                         JOIN Collaborators ON Collaborators.playlist_id = Votelists.playlist_id
-                                         WHERE Collaborators.user_id = $1`,
+        const result = await pool.query(`
+            SELECT * FROM Votelists
+            WHERE owner_id = $1
+            UNION
+            SELECT Votelists.* FROM Votelists
+            JOIN Collaborators ON Collaborators.playlist_id = Votelists.playlist_id
+            WHERE Collaborators.user_id = $1`,
             [userId]
         );
         console.log(result.rows)
@@ -114,13 +118,71 @@ router.post('/register', VerifyTokens, async (req, res) => {
         return res.status(500).send("Failed to retrieve user's id.");
     }
 
-    const { playlist_id: playlistID, playlist_name: playlistName } = req.body;
+    const { playlist_id: playlistId, playlist_name: playlistName } = req.body;
     try { //register votelist
-        const result = await registerVotelist(playlistID, playlistName, userId);
-        res.json(result);
+        const result = await registerVotelist(playlistId, playlistName, userId);
     } catch (error) {
         console.error(error);
         return res.status(500).send('Error registering votelist');
+    }
+
+    let tracks;
+    try {
+        const playlist = await spotifyClient.getUserPlaylistSongs(playlistId)
+        console.log("after getUserPlaylistSongs")
+        tracks = playlist.tracks.items;
+        // res.json(tracks)
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Error getting playlist tracks');
+    }
+
+    let songsVals = tracks.map(track => {
+        const songId = track.track.id;
+        const title = track.track.name.replace(/'/g, "''");  // Escape single quotes
+        const album = track.track.album.name.replace(/'/g, "''");
+        const artists = JSON.stringify(track.track.artists); // Convert to JSON string
+        const duration = track.track.duration_ms;
+    
+        return `('${songId}', '${title}', '${album}', '${artists}'::jsonb, ${duration})`;
+    }).join(',');
+    
+    let votelistSongsVals = tracks.map(track => 
+        `('${track.track.id}', '${playlistId}')`
+    ).join(',');
+    
+    const songsQuery = `
+        INSERT INTO Songs (song_id, title, album, artists, duration) 
+        VALUES ${songsVals} 
+        ON CONFLICT DO NOTHING 
+        RETURNING *;
+    `;
+    
+    const votelistSongsQuery = `
+        INSERT INTO Votelist_Songs (song_id, playlist_id) 
+        VALUES ${votelistSongsVals} 
+        ON CONFLICT DO NOTHING
+        RETURNING *;
+    `;
+
+    console.log("songsVals:" + songsVals)
+    console.log("votelist songs: " + votelistSongsVals)
+
+    try {
+        const result = await pool.query(songsQuery);
+        console.log(result.rows[0])
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Error putting songs into Songs table.');
+    }
+
+    try {
+        const result = await pool.query(votelistSongsQuery);
+        console.log(result)
+        res.json(result)
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Error registering pre-existing playlist songs');
     }
 });
 
@@ -136,16 +198,17 @@ async function registerVotelist(playlistID, playlistName, userId) {
             [playlistID, playlistName, userId]
         );
 
-        // Insert into Collaborators
-        const collaboratorResult = await pgClient.query(
-            `INSERT INTO Collaborators (playlist_id, user_id) 
-             VALUES ($1, $2) RETURNING *;`,
-            [playlistID, userId]
-        );
+        // // Insert into Collaborators
+        // const collaboratorResult = await pgClient.query(
+        //     `INSERT INTO Collaborators (playlist_id, user_id) 
+        //      VALUES ($1, $2) RETURNING *;`,
+        //     [playlistID, userId]
+        // );
 
         await pgClient.query('COMMIT'); // Commit transaction
-        console.log(votelistResult.rows, collaboratorResult.rows);
-        return { votelist: votelistResult.rows[0], collaborator: collaboratorResult.rows[0] };
+        // console.log(votelistResult.rows, collaboratorResult.rows);
+        // return { votelist: votelistResult.rows[0], collaborator: collaboratorResult.rows[0] };
+        return votelistResult.rows[0];
     } catch (error) {
         await pgClient.query('ROLLBACK'); // Rollback if any error occurs
         console.error('Error in registerVotelist:', error);
