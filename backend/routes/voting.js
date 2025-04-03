@@ -40,7 +40,7 @@ router.post('/', VerifyTokens, async (req, res) => {
     const userId = await spotifyClient.getUserData();
     try {
         const result = await pool.query(
-            `INSERT INTO votes(poll_id, user_id, vote)
+            `INSERT INTO Votes(poll_id, user_id, vote)
              VALUES ($1, $2, $3)
              ON CONFLICT (poll_id, user_id) DO UPDATE
              SET vote = EXCLUDED.vote`,
