@@ -30,7 +30,7 @@ const SPOTIFY_SCOPES = process.env.SPOTIFY_SCOPES;
 
 router.get("/", VerifyTokens, (req, res) => {
   console.log("User is authenticated!");
-  res.send(req.cookies);
+  res.redirect(`http://localhost:8000/auth-callback?success=true`);
 });
 
 async function registerUser(access_token) {
@@ -134,7 +134,7 @@ router.get("/callback", async (req, res) => {
 
   }
 
-  res.send("User has been authenticated!");
+  res.redirect(`http://localhost:8000/auth-callback?success=true`);
 });
 
 export async function VerifyTokens(req, res, next) {
