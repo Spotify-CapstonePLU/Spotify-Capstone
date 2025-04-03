@@ -136,16 +136,17 @@ async function registerVotelist(playlistID, playlistName, userId) {
             [playlistID, playlistName, userId]
         );
 
-        // Insert into Collaborators
-        const collaboratorResult = await pgClient.query(
-            `INSERT INTO Collaborators (playlist_id, user_id) 
-             VALUES ($1, $2) RETURNING *;`,
-            [playlistID, userId]
-        );
+        // // Insert into Collaborators
+        // const collaboratorResult = await pgClient.query(
+        //     `INSERT INTO Collaborators (playlist_id, user_id) 
+        //      VALUES ($1, $2) RETURNING *;`,
+        //     [playlistID, userId]
+        // );
 
         await pgClient.query('COMMIT'); // Commit transaction
-        console.log(votelistResult.rows, collaboratorResult.rows);
-        return { votelist: votelistResult.rows[0], collaborator: collaboratorResult.rows[0] };
+        // console.log(votelistResult.rows, collaboratorResult.rows);
+        // return { votelist: votelistResult.rows[0], collaborator: collaboratorResult.rows[0] };
+        return votelistResult.rows[0];
     } catch (error) {
         await pgClient.query('ROLLBACK'); // Rollback if any error occurs
         console.error('Error in registerVotelist:', error);
