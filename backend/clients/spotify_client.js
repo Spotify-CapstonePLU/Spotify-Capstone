@@ -61,6 +61,30 @@ export class SpotifyClient {
         }
     }
 
+    // Get user's playlist by id
+    async getUserPlaylist(playlistId) {
+        try {
+            const response = await this.api.get(`/me/playlists/${playlistId}`);
+            return response.data.tracks.items;
+        } catch (error) {
+            console.error('Error finding playlist:', error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    // Get all songs from user's playlist by playlist id
+    async getUserPlaylistSongs(playlistId) {
+        try {
+            const response = await this.api.get(`/playlists/${playlistId}`, {
+                params: { fields: 'tracks.items(track(album.name, name, id, artists.name, duration_ms))'}
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching playlist songs:', error.response?.data || error.message);
+            throw error;
+        }
+    }
+
     // Optional: Method to update the access token dynamically
     setAccessToken(newToken) {
         this.accessToken = newToken;
