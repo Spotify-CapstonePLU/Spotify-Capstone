@@ -1,11 +1,26 @@
-const express = require("express");
-const axios = require("axios");
-const querystring = require("querystring");
-const cookieParser = require("cookie-parser");
+import express from "express";
+import axios from "axios";
+import querystring from 'querystring'
+import cookieParser from "cookie-parser";
+import dotenv from 'dotenv';
+import pg from 'pg'
+import { SpotifyClient } from "../clients/spotify_client.js";
+
+dotenv.config();
+
+const { Pool } = pg;
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  port: process.env.DB_PORT,
+  password: process.env.DB_PASSWORD,
+  database: "postgres",
+  ssl: { rejectUnauthorized: false }
+});
+
 
 const router = express.Router();
 
-require("dotenv").config();
 router.use(cookieParser());
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
@@ -18,6 +33,35 @@ router.get("/", VerifyTokens, (req, res) => {
   res.send(req.cookies);
 });
 
+async function registerUser(access_token) {
+  const spotifyClient = new SpotifyClient(access_token)
+  let userID;
+  let username;
+  try {
+    const response = await spotifyClient.getUserData();
+    userID = await response.id;
+    username = await response.display_name;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get user data from spotify.")
+  }
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO Users (user_id, user_name)
+        VALUES ($1, $2)
+        ON CONFLICT (user_id) DO UPDATE
+        SET user_name = EXCLUDED.user_name
+        RETURNING *;`,
+      [userID, username]
+    );
+    return await result.rows[0]
+  } catch (error) {
+    console.error(error);
+    throw new Error('Server error registering user.')
+  }
+}
+
 router.get("/callback", async (req, res) => {
   var code = req.query.code || null;
   var state = req.query.state || null;
@@ -25,17 +69,17 @@ router.get("/callback", async (req, res) => {
   if (code === null) {
     return res.redirect(
       "/#" +
-        querystring.stringify({
-          error: "code_mismatch",
-        })
+      querystring.stringify({
+        error: "code_mismatch",
+      })
     );
   }
   if (state === null) {
     return res.redirect(
       "/#" +
-        querystring.stringify({
-          error: "state_mismatch",
-        })
+      querystring.stringify({
+        error: "state_mismatch",
+      })
     );
   } else {
     let response;
@@ -59,9 +103,9 @@ router.get("/callback", async (req, res) => {
       console.log(error);
       return res.redirect(
         "/#" +
-          querystring.stringify({
-            error: "invalid authorization code",
-          })
+        querystring.stringify({
+          error: "invalid authorization code",
+        })
       );
     }
 
@@ -79,12 +123,21 @@ router.get("/callback", async (req, res) => {
       secure: false, // Set to true when deploying to production
       maxAge: expires_in, // 1 hour before expriring
     });
+
+    try {
+      const result = await registerUser(access_token)
+      // res.json(await result);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send('Server error registering user.');
+    }
+
   }
 
   res.send("User has been authenticated!");
 });
 
-async function VerifyTokens(req, res, next) {
+export async function VerifyTokens(req, res, next) {
   const access_token = req.cookies.access_token;
   if (access_token) {
     console.log("Access token found!");
@@ -127,13 +180,13 @@ async function VerifyTokens(req, res, next) {
 
     res.redirect(
       "https://accounts.spotify.com/authorize?" +
-        querystring.stringify({
-          response_type: "code",
-          client_id: CLIENT_ID,
-          scope: SPOTIFY_SCOPES,
-          redirect_uri: REDIRECT_URI,
-          state: state,
-        })
+      querystring.stringify({
+        response_type: "code",
+        client_id: CLIENT_ID,
+        scope: SPOTIFY_SCOPES,
+        redirect_uri: REDIRECT_URI,
+        state: state,
+      })
     );
   }
 }
@@ -150,4 +203,4 @@ function generateRandomString(length) {
   return result;
 }
 
-module.exports = router;
+export default router;
