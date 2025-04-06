@@ -18,9 +18,7 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-
 const router = express.Router();
-
 router.use(cookieParser());
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
@@ -43,6 +41,12 @@ async function registerUser(access_token) {
     username = await response.display_name;
   } catch (error) {
     console.error(error);
+    if (error.response?.status === 401) {
+      // Spotify returned Unauthorized
+      const err = new Error("Invalid or expired Spotify access token.");
+      err.statusCode = 401;
+      throw err;
+    }
     throw new Error("Failed to get user data from spotify.")
   }
 
@@ -58,7 +62,9 @@ async function registerUser(access_token) {
     return await result.rows[0]
   } catch (error) {
     console.error(error);
-    throw new Error('Server error registering user.')
+    const err = new Error('Server error registering user.')
+    err.statusCode = 500;
+    throw err;
   }
 }
 
@@ -101,7 +107,7 @@ router.get("/callback", async (req, res) => {
       );
     } catch (error) {
       console.log(error);
-      return res.redirect(
+      return res.redirect(401, 
         "/#" +
         querystring.stringify({
           error: "invalid authorization code",
@@ -129,9 +135,9 @@ router.get("/callback", async (req, res) => {
       // res.json(await result);
     } catch (error) {
       console.error(error);
-      return res.status(500).send('Server error registering user.');
+      const status = error.statusCode;
+      return res.status(status).send(error.message);
     }
-
   }
 
   res.send("User has been authenticated!");
