@@ -3,6 +3,7 @@ import 'package:spotify_polls/widgets/custom_app_bar.dart';
 import 'package:spotify_polls/widgets/song_cards.dart';
 import 'package:spotify_polls/widgets/media_items.dart';
 import 'package:spotify_polls/widgets/search_items.dart';
+import 'package:spotify_polls/widgets/voting.dart';
 
 import '../widgets/sort_songs.dart';
 
@@ -21,6 +22,7 @@ class _VotingPageState extends State<VotingPage> {
       MediaItemData(
         title: song.songName,
         details: song.artistName,
+        imageUrl: song.imageUrl,
       )
   ).toList();
 
@@ -34,6 +36,20 @@ class _VotingPageState extends State<VotingPage> {
             trackArt: "assets/trackArtPlaceholder.png",
             votes: [0, 0], // Placeholder art
           ));
+    });
+  }
+
+  void _onMediaItemSelected(MediaItemData selectedMedia) {
+    setState(() {
+      _songCards.insert(
+        0,
+        SongCardData(
+          songName: selectedMedia.title,
+          artistName: selectedMedia.details,
+          trackArt: selectedMedia.imageUrl,
+          votes: [0, 0],
+        ),
+      );
     });
   }
 
