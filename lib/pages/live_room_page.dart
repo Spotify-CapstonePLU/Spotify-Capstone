@@ -3,7 +3,7 @@ import 'package:spotify_polls/widgets/control_bar.dart';
 import 'package:spotify_polls/widgets/song_cards.dart';
 import 'package:spotify_polls/widgets/custom_app_bar.dart';
 import 'package:spotify_polls/widgets/song_drawer.dart';
-import 'package:spotify_polls/widgets/media_items.dart';
+import 'package:spotify_polls/models/media_item.dart';
 import 'package:spotify_polls/widgets/voting.dart';
 
 class LiveRoomPage extends StatefulWidget {

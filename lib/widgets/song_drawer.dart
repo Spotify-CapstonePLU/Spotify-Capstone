@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spotify_polls/widgets/media_items.dart';
+import 'package:spotify_polls/models/media_item.dart';
 
 class SongDrawer extends StatefulWidget {
   const SongDrawer({super.key, required this.data});
