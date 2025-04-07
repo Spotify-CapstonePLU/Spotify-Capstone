@@ -129,7 +129,7 @@ class _VotingPageState extends State<VotingPage> {
                               return MediaItemData(
                                 title: songCardData.songName,
                                 details: songCardData.artistName,
-                                imageUrl: "assets/trackArtPlaceholder.png",
+                                imageUrl: songCardData.imageUrl,
                                 onTap: () {
                                   setState(() {
                                     _songCards.remove(songCardData);
@@ -162,7 +162,7 @@ class _VotingPageState extends State<VotingPage> {
                       SongCardData(
                         songName: selectedMedia.title,
                         artistName: selectedMedia.details,
-                        trackArt: "assets/trackArtPlaceholder.png",
+                        trackArt: selectedMedia.imageUrl,
                         votes: [0, 0],
                       ),
                     );
