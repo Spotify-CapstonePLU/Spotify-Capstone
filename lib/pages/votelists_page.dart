@@ -2,9 +2,11 @@ import 'dart:developer';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:spotify_polls/controllers/votelist_controller.dart';
 import 'package:spotify_polls/widgets/custom_app_bar.dart';
 import 'package:spotify_polls/pages/live_login_page.dart';
-import 'package:spotify_polls/widgets/media_items.dart';
+import 'package:spotify_polls/widgets/media_item_list.dart';
+import 'package:spotify_polls/models/media_item.dart';
 import 'package:spotify_polls/pages/voting_page.dart';
 
 class VotelistsPage extends StatefulWidget {
@@ -17,6 +19,7 @@ class VotelistsPage extends StatefulWidget {
 }
 
 class _VotelistsPageState extends State<VotelistsPage> {
+  Future<String> test = VotelistController().getVotelists();
   List<MediaItemData> votelists = [];
   List<MediaItemData> playlists = [
     const MediaItemData(
