@@ -53,6 +53,33 @@ class _VotingPageState extends State<VotingPage> {
     });
   }
 
+  void _sortSongs() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SortSongs(
+          mediaItems: mediaItems.map((item) {
+            return MediaItemData(
+              title: item.title,
+              details: item.details,
+              imageUrl: item.imageUrl,
+              onTap: () {
+                setState(() {
+                  final songToMove = _songCards.firstWhere(
+                        (song) => song.songName == item.title && song.artistName == item.details,
+                  );
+                  _songCards.remove(songToMove);
+                  _songCards.add(songToMove);
+                });
+                Navigator.pop(context);
+              },
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
   List<Widget> buttons = [];
   int noCounter = 0;
   int yesCounter = 0;
