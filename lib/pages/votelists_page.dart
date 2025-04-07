@@ -233,9 +233,6 @@ class _VotelistsPageState extends State<VotelistsPage> {
                       ),
                     ),
                   ],
-                  Container(
-                      padding: const EdgeInsets.all(10),
-                      child: const BackButton()),
                 ],
               )),
           Align(

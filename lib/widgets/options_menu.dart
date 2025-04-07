@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spotify_polls/pages/login_page.dart';
+import 'package:spotify_polls/pages/home_page.dart';
 
 class OptionsMenu extends StatelessWidget {
   const OptionsMenu({super.key});
@@ -9,7 +9,7 @@ class OptionsMenu extends StatelessWidget {
     switch (value) {
       case "Sign Out":
         Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const LoginPage()));
+            MaterialPageRoute(builder: (context) => const HomePage()));
         break;
     }
   }
