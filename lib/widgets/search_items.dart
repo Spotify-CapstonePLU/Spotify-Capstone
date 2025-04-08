@@ -1,6 +1,10 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:spotify_polls/widgets/media_item_list.dart';
 import 'package:spotify_polls/models/media_item.dart';
+import 'package:spotify_polls/controllers/voting_controller.dart';
 
 class SearchItems extends StatefulWidget {
   const SearchItems({
@@ -17,50 +21,66 @@ class SearchItems extends StatefulWidget {
 }
 
 class _SearchItemsState extends State<SearchItems> {
-  List<MediaItemData> allMediaItems = [];
-  List<MediaItemData> filteredItems = [];
+  Timer? _debounce;
+  //List<MediaItemData> allMediaItems = [];
+  List<MediaItemData> searchResults = [];
   final TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    List<MediaItemData> baseItems = [
-      const MediaItemData(
-        title: "Song A",
-        details: "Artist X",
-        imageUrl:
-            "https://upload.wikimedia.org/wikipedia/commons/c/c7/Domestic_shorthaired_cat_face.jpg",
-      ),
-      const MediaItemData(
-        title: "Song B",
-        details: "Artist Y",
-      ),
-    ];
+    // List<MediaItemData> baseItems = [
+    //   const MediaItemData(
+    //     title: "Song A",
+    //     details: "Artist X",
+    //     imageUrl:
+    //         "https://upload.wikimedia.org/wikipedia/commons/c/c7/Domestic_shorthaired_cat_face.jpg",
+    //   ),
+    //   const MediaItemData(
+    //     title: "Song B",
+    //     details: "Artist Y",
+    //   ),
+    // ];
 
-    allMediaItems = baseItems.map((item) {
-      return MediaItemData(
-        title: item.title,
-        details: item.details,
-        imageUrl: item.imageUrl,
-        onTap: () {
-          widget.onMediaItemSelected(item);
-          Navigator.pop(context);
-        },
-      );
-    }).toList();
+    // allMediaItems = baseItems.map((item) {
+    //   return MediaItemData(
+    //     title: item.title,
+    //     details: item.details,
+    //     imageUrl: item.imageUrl,
+    //     onTap: () {
+    //       widget.onMediaItemSelected(item);
+    //       Navigator.pop(context);
+    //     },
+    //   );
+    // }).toList();
 
-    filteredItems = List.from(allMediaItems);
+    // filteredItems = List.from(allMediaItems);
   }
 
-  void search(String searchedSong) {
-    setState(() {
-      filteredItems = searchedSong.isEmpty
-          ? List.from(allMediaItems)
-          : allMediaItems
-              .where((item) =>
-                  item.title.toLowerCase().contains(searchedSong.toLowerCase()))
-              .toList();
+  Future<void> search(String query) async {
+    try {
+      final response = await VotingController().searchSongs(query);
+      setState(() {
+        searchResults = response;
+      });
+      print('Finished search');
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  void _onSearchChanged(String query) {
+    if(_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      if(query.isNotEmpty) {
+        search(query);
+      } else {
+        setState(() {
+          searchResults = [];
+        });
+      }
     });
   }
 
@@ -82,11 +102,13 @@ class _SearchItemsState extends State<SearchItems> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onChanged: search,
+                onChanged: (query) {
+                  _onSearchChanged(query);
+                  },
               ),
               const SizedBox(height: 10),
               Expanded(
-                child: MediaItemList(listData: filteredItems),
+                child: MediaItemList(listData: searchResults),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
