@@ -5,6 +5,7 @@ import 'package:spotify_polls/widgets/media_items.dart';
 import 'package:spotify_polls/widgets/search_items.dart';
 import 'package:spotify_polls/widgets/voting.dart';
 
+import '../widgets/song_drawer.dart';
 import '../widgets/sort_songs.dart';
 
 class VotingPage extends StatefulWidget {
@@ -17,6 +18,7 @@ class VotingPage extends StatefulWidget {
 
 class _VotingPageState extends State<VotingPage> {
   final List<SongCardData> _songCards = [];
+  late Key _votingWidgetKey = UniqueKey();
 
   List<MediaItemData> get mediaItems => _songCards.map((song) =>
       MediaItemData(
@@ -38,6 +40,7 @@ class _VotingPageState extends State<VotingPage> {
           votes: [0, 0],
         ),
       );
+      _votingWidgetKey = UniqueKey();
     });
   }
 
@@ -46,18 +49,16 @@ class _VotingPageState extends State<VotingPage> {
       context: context,
       builder: (BuildContext context) {
         return SortSongs(
-          mediaItems: _songCards.map((item) {
+          mediaItems: _songCards.map((songCardData) {
             return MediaItemData(
-              title: item.songName,
-              details: item.artistName,
-              imageUrl: item.trackArt,
+              title: songCardData.songName,
+              details: songCardData.artistName,
+              imageUrl: songCardData.trackArt,
               onTap: () {
                 setState(() {
-                  final songToMove = _songCards.firstWhere(
-                        (song) => song.songName == item.songName && song.artistName == item.artistName,
-                  );
-                  _songCards.remove(songToMove);
-                  _songCards.add(songToMove);
+                  _songCards.remove(songCardData);
+                  _songCards.add(songCardData);
+                  _votingWidgetKey = UniqueKey();
                 });
                 Navigator.pop(context);
               },
@@ -82,15 +83,14 @@ class _VotingPageState extends State<VotingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: SongDrawer(data: mediaItems),
       appBar: CustomAppBar(title: widget.title),
       body: Stack(
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(
-                child: Voting(initSongCards: _songCards),
-              ),
+              Voting(key: _votingWidgetKey, initSongCards: _songCards),
               ElevatedButton(
                 onPressed: _sortSongs,
                 child: const Text("Sort Songs"),
