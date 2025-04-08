@@ -16,17 +16,6 @@ class SearchItems extends StatefulWidget {
 }
 
 class _SearchItemsState extends State<SearchItems> {
-  List<MediaItemData> mediaItems = [
-    const MediaItemData(title: "Song A", details: "Artist A"),
-    const MediaItemData(title: "Song B", details: "Artist B"),
-    const MediaItemData(title: "Song C", details: "Artist C"),
-    const MediaItemData(title: "Song D", details: "Artist C"),
-    const MediaItemData(title: "Song E", details: "Artist D"),
-    const MediaItemData(title: "Song F", details: "Artist E"),
-    const MediaItemData(title: "Song G", details: "Artist F"),
-    const MediaItemData(title: "Song H", details: "Artist F"),
-    const MediaItemData(title: "Song A", details: "Artist F"),
-  ];
   List<MediaItemData> allMediaItems = [];
   List<MediaItemData> filteredItems = [];
   final TextEditingController searchController = TextEditingController();
@@ -35,32 +24,30 @@ class _SearchItemsState extends State<SearchItems> {
   void initState() {
     super.initState();
 
-    allMediaItems = [
-      MediaItemData(
+    List<MediaItemData> baseItems = [
+      const MediaItemData(
         title: "Song A",
         details: "Artist X",
-        onTap: () {
-          widget.onMediaItemSelected(const MediaItemData(
-            title: "Song A",
-            details: "Artist X",
-            imageUrl:
-            "https://upload.wikimedia.org/wikipedia/commons/c/c7/Domestic_shorthaired_cat_face.jpg",
-          ));
-          Navigator.pop(context);
-        },
+        imageUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Domestic_shorthaired_cat_face.jpg",
       ),
-      MediaItemData(
+      const MediaItemData(
         title: "Song B",
         details: "Artist Y",
-        onTap: () {
-          widget.onMediaItemSelected(const MediaItemData(
-            title: "Song B",
-            details: "Artist Y",
-          ));
-          Navigator.pop(context);
-        },
       ),
     ];
+
+    allMediaItems = baseItems.map((item) {
+      return MediaItemData(
+        title: item.title,
+        details: item.details,
+        imageUrl: item.imageUrl,
+        onTap: () {
+          widget.onMediaItemSelected(item);
+          Navigator.pop(context);
+        },
+      );
+    }).toList();
+
     filteredItems = List.from(allMediaItems);
   }
 
