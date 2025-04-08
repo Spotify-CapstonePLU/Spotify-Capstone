@@ -83,7 +83,6 @@ class _VotingPageState extends State<VotingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: SongDrawer(data: mediaItems),
       appBar: CustomAppBar(title: widget.title),
       body: Stack(
         children: [
