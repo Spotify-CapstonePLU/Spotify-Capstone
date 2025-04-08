@@ -1,9 +1,9 @@
 import express from "express";
 import axios from "axios";
-import querystring from 'querystring'
+import querystring from "querystring";
 import cookieParser from "cookie-parser";
-import dotenv from 'dotenv';
-import pg from 'pg'
+import dotenv from "dotenv";
+import pg from "pg";
 import { SpotifyClient } from "../clients/spotify_client.js";
 
 dotenv.config();
@@ -15,9 +15,8 @@ const pool = new Pool({
   port: process.env.DB_PORT,
   password: process.env.DB_PASSWORD,
   database: "postgres",
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
 });
-
 
 const router = express.Router();
 
@@ -30,11 +29,11 @@ const SPOTIFY_SCOPES = process.env.SPOTIFY_SCOPES;
 
 router.get("/", VerifyTokens, (req, res) => {
   console.log("User is authenticated!");
-  res.redirect(`http://localhost:8000/auth-callback?success=true`);
+  res.redirect(`http://127.0.0.1:8000/auth-callback?success=true`)
 });
 
 async function registerUser(access_token) {
-  const spotifyClient = new SpotifyClient(access_token)
+  const spotifyClient = new SpotifyClient(access_token);
   let userID;
   let username;
   try {
@@ -43,7 +42,7 @@ async function registerUser(access_token) {
     username = await response.display_name;
   } catch (error) {
     console.error(error);
-    throw new Error("Failed to get user data from spotify.")
+    throw new Error("Failed to get user data from spotify.");
   }
 
   try {
@@ -55,10 +54,10 @@ async function registerUser(access_token) {
         RETURNING *;`,
       [userID, username]
     );
-    return await result.rows[0]
+    return await result.rows[0];
   } catch (error) {
     console.error(error);
-    throw new Error('Server error registering user.')
+    throw new Error("Server error registering user.");
   }
 }
 
@@ -69,17 +68,17 @@ router.get("/callback", async (req, res) => {
   if (code === null) {
     return res.redirect(
       "/#" +
-      querystring.stringify({
-        error: "code_mismatch",
-      })
+        querystring.stringify({
+          error: "code_mismatch",
+        })
     );
   }
   if (state === null) {
     return res.redirect(
       "/#" +
-      querystring.stringify({
-        error: "state_mismatch",
-      })
+        querystring.stringify({
+          error: "state_mismatch",
+        })
     );
   } else {
     let response;
@@ -103,9 +102,9 @@ router.get("/callback", async (req, res) => {
       console.log(error);
       return res.redirect(
         "/#" +
-        querystring.stringify({
-          error: "invalid authorization code",
-        })
+          querystring.stringify({
+            error: "invalid authorization code",
+          })
       );
     }
 
@@ -115,29 +114,34 @@ router.get("/callback", async (req, res) => {
     const refresh_token = response.data.refresh_token;
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
+      sameSite: 'Lax',
       secure: false, // Set to true when deploying to production
       maxAge: 1000 * 60 * 60 * 24 * 30, // Set to expire in 30 days
     });
     res.cookie("access_token", access_token, {
       httpOnly: true,
+      sameSite: 'Lax',
       secure: false, // Set to true when deploying to production
       maxAge: expires_in, // 1 hour before expriring
     });
 
+    res.locals.refresh_token = refresh_token;
+    res.locals.access_token = access_token;
+
     try {
-      const result = await registerUser(access_token)
+      const result = await registerUser(access_token);
       // res.json(await result);
     } catch (error) {
       console.error(error);
-      return res.status(500).send('Server error registering user.');
+      return res.status(500).send("Server error registering user.");
     }
-
   }
 
-  res.redirect(`http://localhost:8000/auth-callback?success=true`);
+  res.redirect(`http://127.0.0.1:8000/auth-callback?success=true`);
 });
 
 export async function VerifyTokens(req, res, next) {
+  console.log('[VERIFY]', req.method, req.originalUrl, req.cookies);
   const access_token = req.cookies.access_token;
   if (access_token) {
     console.log("Access token found!");
@@ -169,9 +173,12 @@ export async function VerifyTokens(req, res, next) {
     const expires_in = response.data.expires_in * 1000;
     res.cookie("access_token", new_access_token, {
       httpOnly: true,
+      sameSite: 'Lax',
       secure: false, // Set to true when deploying to production
       maxAge: expires_in, // 1 hour before expiring
     });
+
+    res.locals.access_token = new_access_token;
 
     return next();
   } else {
@@ -180,15 +187,52 @@ export async function VerifyTokens(req, res, next) {
 
     res.redirect(
       "https://accounts.spotify.com/authorize?" +
-      querystring.stringify({
-        response_type: "code",
-        client_id: CLIENT_ID,
-        scope: SPOTIFY_SCOPES,
-        redirect_uri: REDIRECT_URI,
-        state: state,
-      })
+        querystring.stringify({
+          response_type: "code",
+          client_id: CLIENT_ID,
+          scope: SPOTIFY_SCOPES,
+          redirect_uri: REDIRECT_URI,
+          state: state,
+        })
     );
   }
+}
+
+export async function AuthenticateApp(req, res, next) {
+  var app_token = req.cookies.app_token;
+  if (app_token) {
+    console.log("App has token!");
+    return next();
+  }
+
+  console.log("No app token found!");
+
+  const response = await axios.post(
+    "https://accounts.spotify.com/api/token",
+    querystring.stringify({
+      grant_type: "client_credentials",
+    }),
+    {
+      headers: {
+        Authorization:
+          "Basic " +
+          new Buffer.from(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64"),
+      },
+      json: true,
+    }
+  );
+
+  const expires_in = response.data.expires_in;
+  app_token = response.data.access_token;
+
+  res.cookie("app_token", app_token, {
+    httpOnly: true,
+    secure: false, // Set to true when deploying to production
+    maxAge: expires_in, // 1 hour before expiring
+  });
+  res.locals.app_token = app_token;
+
+  return next();
 }
 
 function generateRandomString(length) {
