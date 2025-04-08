@@ -16,7 +16,7 @@ class Votelist extends MediaItemData {
   factory Votelist.fromJson(Map<String, dynamic> json) {
     return Votelist(
         title: json['playlist_name'],
-        details: 'votelist',
+        details: '',
         playlistId: json['playlist_id'],
         maxPollDuration: PostgresInterval.fromJson(json['max_poll_duration']),
         minPollTimeout: PostgresInterval.fromJson(json['min_poll_timeout']));
