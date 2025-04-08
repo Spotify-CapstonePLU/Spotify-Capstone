@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spotify_polls/widgets/media_items.dart';
 import 'package:spotify_polls/widgets/ring_chart.dart';
 
 class SongCardList extends StatefulWidget {
@@ -142,7 +143,7 @@ class _SongCardState extends State<SongCard> {
                     0.01), // Adjust the padding value as needed
                 child: Stack(
                   children: [
-                    widget.cardData.trackArt,
+                    Image.network(widget.cardData.trackArt),
                     Positioned(
                       top: 0, // Align to the top
                       right: 0, // Align to the right
@@ -181,16 +182,20 @@ class _SongCardState extends State<SongCard> {
   }
 }
 
-class SongCardData {
+class SongCardData extends MediaItemData{
   const SongCardData({
     required this.songName,
     required this.artistName,
-    required this.trackArt,
+    required String trackArt,
     required this.votes,
-  });
+  }) : super(
+    title: songName,
+    details: artistName,
+    imageUrl: trackArt,
+  );
 
   final String songName;
   final String artistName;
-  final Image trackArt;
+  String get trackArt => imageUrl;
   final List<double> votes;
 }
