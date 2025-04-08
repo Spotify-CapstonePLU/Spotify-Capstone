@@ -42,9 +42,10 @@ class _VotelistsPageState extends State<VotelistsPage> {
     _votelistFuture = VotelistController().getVotelists();
   }
 
-  void addNewVotelist(MediaItemData itemData) {
+  void addNewVotelist(String name) {
+    VotelistController().createVotelist(name);
     setState(() {
-      //votelists.add(itemData);
+      _votelistFuture = VotelistController().getVotelists();
     });
   }
 
@@ -69,14 +70,14 @@ class _VotelistsPageState extends State<VotelistsPage> {
         // the text that the user has entered into the text field.
         onPressed: () {
           Navigator.of(context)
-              .pop(MediaItemData(title: myController.text, details: ''));
+              .pop(myController.text);
           myController.dispose();
         },
         child: const Text("Submit"),
       );
     }
 
-    final result = await showDialog(
+    final result = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
@@ -88,20 +89,20 @@ class _VotelistsPageState extends State<VotelistsPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text("Create Popup", style: TextStyle(fontSize: 18)),
+                const Text("Create a new votelist", style: TextStyle(fontSize: 18)),
                 inputField(),
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     submitButton(),
-                    ElevatedButton(
-                      onPressed: () {
-                        myController.dispose();
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text("Close"),
-                    ),
+                    // ElevatedButton(
+                    //   onPressed: () {
+                    //     myController.dispose();
+                    //     Navigator.of(context).pop();
+                    //   },
+                    //   child: const Text("Close"),
+                    // ),
                   ],
                 ),
               ],
@@ -127,7 +128,7 @@ class _VotelistsPageState extends State<VotelistsPage> {
     final double rightPadding = MediaQuery.of(context).viewPadding.right;
 
     void showRegisterPopup(BuildContext context) async {
-      final result = await showDialog<MediaItemData>(
+      final result = await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
           return Dialog(
@@ -199,7 +200,10 @@ class _VotelistsPageState extends State<VotelistsPage> {
                         } else if (snapshot.hasData) {
                           List<Votelist> votelists = snapshot.data!;
 
-                          return Padding(
+                          if(votelists.isEmpty) {
+                            return const Center(child: Text('You have no registered Votelists!'));
+                          } else {
+                            return Padding(
                             padding: const EdgeInsets.all(12),
                             child: MediaItemList(
                               listData: [
@@ -217,6 +221,7 @@ class _VotelistsPageState extends State<VotelistsPage> {
                               ],
                             ),
                           );
+                          }
                         } else {
                           return const Center(child: Text('You have no registered Votelists!'));
                         }

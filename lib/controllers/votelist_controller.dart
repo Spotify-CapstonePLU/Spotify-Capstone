@@ -18,7 +18,7 @@ class VotelistController {
     );
 
     print('Received response from GET call.');
-    if (request.status == 200) {
+    if (request.status! < 400 && request.status! >= 100) {
       log('Successful response status');
       final List<dynamic> data = jsonDecode(request.responseText!);
       final votelists = data.map((item) => Votelist.fromJson(item)).toList();
@@ -30,7 +30,7 @@ class VotelistController {
     }
   }
 
-  Future<Votelist> createVotelist(String name) async {
+  Future<void> createVotelist(String name) async {
     print('Called createVotelist() function.');
 
     final request = await HttpRequest.request('$baseUrl/votelists/create',
@@ -41,10 +41,7 @@ class VotelistController {
           'playlist_name': name,
         }));
 
-    if (request.status == 201) {
-      return Votelist.fromJson(
-          jsonDecode(request.responseText!) as Map<String, dynamic>);
-    } else {
+    if (request.status! > 400) {
       throw Exception(
           'Failed to create Votelist with status: ${request.status}');
     }
@@ -57,7 +54,7 @@ class VotelistController {
         withCredentials: true,
         sendData: jsonEncode({'playlist_id': id, 'playlist_name': name}));
 
-    if (request.status == 201) {
+    if (request.status! < 400 && request.status! >= 100) {
       return Votelist.fromJson(
           jsonDecode(request.responseText!) as Map<String, dynamic>);
     } else {
@@ -74,7 +71,7 @@ class VotelistController {
       withCredentials: true,
     );
 
-    if (request.status == 200) {
+    if (request.status! < 400 && request.status! >= 100) {
       return const MediaItemData(title: 'title', details: 'details');
     } else {
       throw Exception(
