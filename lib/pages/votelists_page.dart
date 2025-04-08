@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:spotify_polls/controllers/votelist_controller.dart';
+import 'package:spotify_polls/models/votelist.dart';
 import 'package:spotify_polls/widgets/custom_app_bar.dart';
 import 'package:spotify_polls/pages/live_login_page.dart';
 import 'package:spotify_polls/widgets/media_item_list.dart';
@@ -19,8 +20,8 @@ class VotelistsPage extends StatefulWidget {
 }
 
 class _VotelistsPageState extends State<VotelistsPage> {
-  Future<String> test = VotelistController().getVotelists();
-  List<MediaItemData> votelists = [];
+  late Future<List<Votelist>> _votelistFuture;
+  //List<Votelist> votelists = [];
   List<MediaItemData> playlists = [
     const MediaItemData(
         title: "playlist1",
@@ -35,9 +36,15 @@ class _VotelistsPageState extends State<VotelistsPage> {
   ];
   bool _isBlurred = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _votelistFuture = VotelistController().getVotelists();
+  }
+
   void addNewVotelist(MediaItemData itemData) {
     setState(() {
-      votelists.add(itemData);
+      //votelists.add(itemData);
     });
   }
 
@@ -182,28 +189,38 @@ class _VotelistsPageState extends State<VotelistsPage> {
               child: Stack(
                 children: [
                   Center(
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Padding(
+                    child: FutureBuilder<List<Votelist>>(
+                      future: _votelistFuture,
+                      builder: (context, snapshot) {
+                        if(snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));
+                        } else if (snapshot.hasData) {
+                          List<Votelist> votelists = snapshot.data!;
+
+                          return Padding(
                             padding: const EdgeInsets.all(12),
                             child: MediaItemList(
                               listData: [
                                 for (var itemData in votelists)
                                   MediaItemData(
-                                    title: itemData.title,
+                                    title: itemData.title, 
                                     details: itemData.details,
                                     imageUrl: itemData.imageUrl,
                                     onTap: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const VotingPage())),
-                                  )
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const VotingPage()
+                                      )
+                                    ))
                               ],
                             ),
-                        ))
-                      ],
+                          );
+                        } else {
+                          return const Center(child: Text('You have no registered Votelists!'));
+                        }
+                      },
                     ),
                   ),
                   if (_isBlurred)
