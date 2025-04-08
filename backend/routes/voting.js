@@ -54,10 +54,10 @@ router.post('/', VerifyTokens, async (req, res) => {
 });
 
 // Search songs on Spotify
-router.get('/search/:song', AuthenticateApp, async (req, res) => {
+router.get('/search', AuthenticateApp, async (req, res) => {
     // TODO VerifyTokens
     const app_token = (req.cookies.app_token) ? req.cookies.app_token : res.locals.app_token;
-    const { song } = req.params
+    const song = req.query.song;
     const spotifyClient = new SpotifyClient(app_token);
     console.log(app_token)
     try {        

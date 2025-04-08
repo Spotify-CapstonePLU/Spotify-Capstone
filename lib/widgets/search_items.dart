@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:spotify_polls/widgets/media_items.dart';
+import 'package:spotify_polls/widgets/media_item_list.dart';
+import 'package:spotify_polls/models/media_item.dart';
 
 class SearchItems extends StatefulWidget {
   const SearchItems({
@@ -28,7 +29,8 @@ class _SearchItemsState extends State<SearchItems> {
       const MediaItemData(
         title: "Song A",
         details: "Artist X",
-        imageUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Domestic_shorthaired_cat_face.jpg",
+        imageUrl:
+            "https://upload.wikimedia.org/wikipedia/commons/c/c7/Domestic_shorthaired_cat_face.jpg",
       ),
       const MediaItemData(
         title: "Song B",
@@ -56,9 +58,9 @@ class _SearchItemsState extends State<SearchItems> {
       filteredItems = searchedSong.isEmpty
           ? List.from(allMediaItems)
           : allMediaItems
-          .where((item) =>
-      item.title.toLowerCase().contains(searchedSong.toLowerCase()))
-          .toList();
+              .where((item) =>
+                  item.title.toLowerCase().contains(searchedSong.toLowerCase()))
+              .toList();
     });
   }
 
@@ -90,9 +92,7 @@ class _SearchItemsState extends State<SearchItems> {
                 onPressed: () => Navigator.pop(context),
                 child: const Text("Close"),
               ),
-            ])
-        )
-    );
+            ])));
   }
 }
 //

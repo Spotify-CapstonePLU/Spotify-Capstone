@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_polls/widgets/song_cards.dart';
 
-import 'media_items.dart';
+import 'package:spotify_polls/models/media_item.dart';
+import 'package:spotify_polls/widgets/media_item_list.dart';
 
-class SortSongs extends StatefulWidget{
+class SortSongs extends StatefulWidget {
   const SortSongs({
     super.key,
     this.title = "Sort Songs",
@@ -16,7 +17,7 @@ class SortSongs extends StatefulWidget{
   State<SortSongs> createState() => _SortSongsState();
 }
 
-class _SortSongsState extends State<SortSongs>{
+class _SortSongsState extends State<SortSongs> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
