@@ -24,6 +24,7 @@ router.use(cookieParser());
 router.get('/', VerifyTokens, async (req, res) => {
     let userId;
     const spotifyClient = new SpotifyClient(req.cookies.access_token);
+    console.log('reached /votelists route')
     try { // Retrieve user's id
         const userData = await spotifyClient.getUserData();
         userId = userData.id;
@@ -38,13 +39,9 @@ router.get('/', VerifyTokens, async (req, res) => {
     
     try {
         console.log("attempt connection")
-        const result = await pool.query(`
-            SELECT * FROM Votelists
-            WHERE owner_id = $1
-            UNION
-            SELECT Votelists.* FROM Votelists
-            JOIN Collaborators ON Collaborators.playlist_id = Votelists.playlist_id
-            WHERE Collaborators.user_id = $1`,
+        const result = await pool.query(`SELECT Votelists.* FROM Votelists
+                                         LEFT JOIN Collaborators ON collaborators.user_id = votelists.owner_id
+                                         WHERE Votelists.owner_id = $1`,
             [userId]
         );
         console.log(result.rows)
@@ -198,17 +195,9 @@ async function registerVotelist(playlistID, playlistName, userId) {
             [playlistID, playlistName, userId]
         );
 
-        // // Insert into Collaborators
-        // const collaboratorResult = await pgClient.query(
-        //     `INSERT INTO Collaborators (playlist_id, user_id) 
-        //      VALUES ($1, $2) RETURNING *;`,
-        //     [playlistID, userId]
-        // );
-
         await pgClient.query('COMMIT'); // Commit transaction
-        // console.log(votelistResult.rows, collaboratorResult.rows);
-        // return { votelist: votelistResult.rows[0], collaborator: collaboratorResult.rows[0] };
-        return votelistResult.rows[0];
+        console.log(votelistResult.rows);
+        return { votelist: votelistResult.rows[0] };
     } catch (error) {
         await pgClient.query('ROLLBACK'); // Rollback if any error occurs
         console.error('Error in registerVotelist:', error);

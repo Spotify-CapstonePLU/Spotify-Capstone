@@ -27,8 +27,7 @@ class _VotingState extends State<Voting> {
           SongCardData(
             songName: "Song ${_songCards.length + 1}",
             artistName: "Artist ${_songCards.length + 1}",
-            trackArt: Image.network(
-                'assets/trackArtPlaceholder.png'),
+            trackArt: "assets/trackArtPlaceholder.png",
             votes: [0, 0],// Placeholder art
           ));
     });
