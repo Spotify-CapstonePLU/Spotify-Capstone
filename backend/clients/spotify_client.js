@@ -18,7 +18,6 @@ export class SpotifyClient {
                 "public": true,
                 "collaborative": false
             })
-            // console.log(await response.data)
             return await response.data
         } catch (error) {
             console.error('Error creating playlist:', error.response?.data || error.message);
@@ -26,7 +25,7 @@ export class SpotifyClient {
         }
     }
 
-    // Method to search for songs
+    // Search for songs
     async searchSongs(query) {
         try {
             const response = await this.api.get('/search', {
@@ -50,13 +49,37 @@ export class SpotifyClient {
         }
     }
 
-    // Method to get the authenticated user's playlists
+    // Get user's playlists
     async getUserPlaylists() {
         try {
             const response = await this.api.get('/me/playlists');
             return response.data;
         } catch (error) {
             console.error('Error fetching playlists:', error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    // Get user's playlist by id
+    async getUserPlaylist(playlistId) {
+        try {
+            const response = await this.api.get(`/me/playlists/${playlistId}`);
+            return response.data.tracks.items;
+        } catch (error) {
+            console.error('Error finding playlist:', error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    // Get all songs from user's playlist by playlist id
+    async getUserPlaylistSongs(playlistId) {
+        try {
+            const response = await this.api.get(`/playlists/${playlistId}`, {
+                params: { fields: 'tracks.items(track(album.name, name, id, artists.name, duration_ms))'}
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching playlist songs:', error.response?.data || error.message);
             throw error;
         }
     }
