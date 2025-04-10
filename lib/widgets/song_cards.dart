@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spotify_polls/widgets/media_items.dart';
+import 'package:spotify_polls/models/media_item.dart';
 import 'package:spotify_polls/widgets/ring_chart.dart';
 
 class SongCardList extends StatefulWidget {
