@@ -9,13 +9,13 @@ dotenv.config();
 
 const { Pool } = pg;
 const router = Router();
-const pool = new Pool({ 
+const pool = new Pool({
     host: process.env.DB_HOST,
-    user: process.env.DB_USER, 
+    user: process.env.DB_USER,
     port: process.env.DB_PORT,
     password: process.env.DB_PASSWORD,
     database: "postgres",
-    ssl: { rejectUnauthorized: false } 
+    ssl: { rejectUnauthorized: false }
 });
 
 router.use(cookieParser());
@@ -24,18 +24,22 @@ router.use(cookieParser());
 router.get('/', VerifyTokens, async (req, res) => {
     let userId;
     const spotifyClient = new SpotifyClient(req.cookies.access_token);
-    try { // Retrieve user's id
+    try {
         const userData = await spotifyClient.getUserData();
-        userId = userData.id;
-        console.log("/ route, userId:" + userId);
+        const userId = userData.id;
+        // console.log("/ route, userId:" + userId);
+
         if (!userId) {
-            throw new Error("userId is undefined.")
+            return res.status(404).send("User ID not found.");
         }
-    } catch(error) {
+    } catch (error) {
         console.error(error);
+        if (error.response?.status === 401) {
+            return res.status(401).send("Invalid or expired Spotify access token.");
+        }
         return res.status(500).send("Failed to retrieve user's id.");
     }
-    
+
     try {
         console.log("attempt connection")
         const result = await pool.query(`
@@ -71,24 +75,27 @@ router.post('/create', VerifyTokens, async (req, res) => {
     try { // Retrieve user's id
         const userData = await spotifyClient.getUserData();
         userId = userData.id;
-        console.log("/create route, userId:" + userId);
+        // console.log("/create route, userId:" + userId);
         if (!userId) {
-            throw new Error("userId is undefined.")
+            return res.status(404).send("User ID not found.");
         }
-    } catch(error) {
+    } catch (error) {
         console.error(error);
+        if (error.response?.status === 401) {
+            return res.status(401).send("Invalid or expired Spotify access token.");
+        }
         return res.status(500).send("Failed to retrieve user's id.");
     }
 
     try { // Get response from playlist creation
         const playlistData = await spotifyClient.createPlaylist(playlistName, userId);
-        
+
         console.log('playlist data:' + await playlistData.id);
 
         if (!playlistData.id) {
-            throw new Error('Missing required field: id.')
+            return res.status(400).send("Playlist Id is required.");
         }
-        
+
         try { // Use playlist id in response to register as votelist.
             const result = await registerVotelist(await playlistData.id, playlistName, userId);
             res.json(result);
@@ -97,7 +104,7 @@ router.post('/create', VerifyTokens, async (req, res) => {
             return res.status(500).send('Error registering votelist');
         }
 
-    } catch(error) {
+    } catch (error) {
         console.error(error)
         return res.status(500).send("Failed to create Spotify playlist.")
     }
@@ -113,7 +120,7 @@ router.post('/register', VerifyTokens, async (req, res) => {
         const userData = await spotifyClient.getUserData();
         userId = userData.id;
         console.log("/register route, userId:" + userId);
-    } catch(error) {
+    } catch (error) {
         console.error(error);
         return res.status(500).send("Failed to retrieve user's id.");
     }
@@ -123,7 +130,7 @@ router.post('/register', VerifyTokens, async (req, res) => {
         const result = await registerVotelist(playlistId, playlistName, userId);
     } catch (error) {
         console.error(error);
-        return res.status(500).send('Error registering votelist');
+        return res.status(error.statusCode).send(error.message);
     }
 
     let tracks;
@@ -143,21 +150,21 @@ router.post('/register', VerifyTokens, async (req, res) => {
         const album = track.track.album.name.replace(/'/g, "''");
         const artists = JSON.stringify(track.track.artists); // Convert to JSON string
         const duration = track.track.duration_ms;
-    
+
         return `('${songId}', '${title}', '${album}', '${artists}'::jsonb, ${duration})`;
     }).join(',');
-    
-    let votelistSongsVals = tracks.map(track => 
+
+    let votelistSongsVals = tracks.map(track =>
         `('${track.track.id}', '${playlistId}')`
     ).join(',');
-    
+
     const songsQuery = `
         INSERT INTO Songs (song_id, title, album, artists, duration) 
         VALUES ${songsVals} 
         ON CONFLICT DO NOTHING 
         RETURNING *;
     `;
-    
+
     const votelistSongsQuery = `
         INSERT INTO Votelist_Songs (song_id, playlist_id) 
         VALUES ${votelistSongsVals} 
@@ -211,7 +218,7 @@ async function registerVotelist(playlistID, playlistName, userId) {
         return votelistResult.rows[0];
     } catch (error) {
         await pgClient.query('ROLLBACK'); // Rollback if any error occurs
-        console.error('Error in registerVotelist:', error);
+        console.error('Error registering votelist:', error);
         throw error;
     } finally {
         pgClient.release(); // Release the client back to the pool
