@@ -54,8 +54,13 @@ router.get('/', VerifyTokens, async (req, res) => {
         console.log(result.rows)
         res.json(result.rows);
     } catch (error) {
-        console.error(error);
-        return res.status(500).send('Server error getting votelists');
+        console.error("Server error getting votelists:", {
+            message: error.message,
+            code: error.code,
+            detail: error.detail,
+            stack: error.stack
+        });
+        return res.status(500).send('Server error getting votelists.');
     }
 });
 
@@ -93,15 +98,34 @@ router.post('/create', VerifyTokens, async (req, res) => {
         console.log('playlist data:' + await playlistData.id);
 
         if (!playlistData.id) {
-            return res.status(400).send("Playlist Id is required.");
+            return res.status(502).send("Invalid response from Spotify API - playlist id missing.");
         }
 
-        try { // Use playlist id in response to register as votelist.
-            const result = await registerVotelist(await playlistData.id, playlistName, userId);
-            res.json(result);
+        const playlistId = playlistData.id
+        try { //register votelist
+            const result = await registerVotelist(playlistId, playlistName, userId);
         } catch (error) {
-            console.error(error);
-            return res.status(500).send('Error registering votelist');
+            // console.error('Error registering votelist:', error);
+
+            // Default status code
+            let status = 500;
+            let message = 'Internal Server Error';
+
+            // Handle specific Postgres error codes
+            if (error.code === '23505') {
+                // Unique constraint violation
+                status = 409;
+                message = 'A votelist with this playlist already exists.';
+            } else if (error.code === '23503') {
+                // Foreign key violation
+                status = 400;
+                message = 'Invalid user or playlist ID.';
+            } else if (error.message) {
+                // Fallback to error message if available
+                message = error.message;
+            }
+
+            return res.status(status).send(message);
         }
 
     } catch (error) {
@@ -119,9 +143,15 @@ router.post('/register', VerifyTokens, async (req, res) => {
     try { // Retrieve user's id
         const userData = await spotifyClient.getUserData();
         userId = userData.id;
-        console.log("/register route, userId:" + userId);
+        // console.log("/create route, userId:" + userId);
+        if (!userId) {
+            return res.status(404).send("User ID not found.");
+        }
     } catch (error) {
         console.error(error);
+        if (error.response?.status === 401) {
+            return res.status(401).send("Invalid or expired Spotify access token.");
+        }
         return res.status(500).send("Failed to retrieve user's id.");
     }
 
@@ -129,16 +159,34 @@ router.post('/register', VerifyTokens, async (req, res) => {
     try { //register votelist
         const result = await registerVotelist(playlistId, playlistName, userId);
     } catch (error) {
-        console.error(error);
-        return res.status(error.statusCode).send(error.message);
+        // console.error('Error registering votelist:', error);
+
+        // Default status code
+        let status = 500;
+        let message = 'Internal Server Error';
+
+        // Handle specific Postgres error codes
+        if (error.code === '23505') {
+            // Unique constraint violation
+            status = 409;
+            message = 'A votelist with this playlist already exists.';
+        } else if (error.code === '23503') {
+            // Foreign key violation
+            status = 400;
+            message = 'Invalid user or playlist ID.';
+        } else if (error.message) {
+            // Fallback to error message if available
+            message = error.message;
+        }
+
+        return res.status(status).send(message);
     }
 
     let tracks;
     try {
         const playlist = await spotifyClient.getUserPlaylistSongs(playlistId)
-        console.log("after getUserPlaylistSongs")
+        // console.log("after getUserPlaylistSongs")
         tracks = playlist.tracks.items;
-        // res.json(tracks)
     } catch (error) {
         console.error(error);
         return res.status(500).send('Error getting playlist tracks');
@@ -172,15 +220,20 @@ router.post('/register', VerifyTokens, async (req, res) => {
         RETURNING *;
     `;
 
-    console.log("songsVals:" + songsVals)
-    console.log("votelist songs: " + votelistSongsVals)
+    console.log("songsVals:", songsVals)
+    console.log("votelist songs: ", votelistSongsVals)
 
     try {
         const result = await pool.query(songsQuery);
         console.log(result.rows[0])
     } catch (error) {
-        console.error(error);
-        return res.status(500).send('Error putting songs into Songs table.');
+        console.error("Error inserting songs into Songs table:", {
+            message: error.message,
+            code: error.code,
+            detail: error.detail,
+            stack: error.stack
+        });
+        return res.status(500).send('Error inserting songs into Songs table.');
     }
 
     try {
@@ -188,8 +241,13 @@ router.post('/register', VerifyTokens, async (req, res) => {
         console.log(result)
         res.json(result)
     } catch (error) {
-        console.error(error);
-        return res.status(500).send('Error registering pre-existing playlist songs');
+        console.error("Error registering pre-existing playlist songs:", {
+            message: error.message,
+            code: error.code,
+            detail: error.detail,
+            stack: error.stack
+        });
+        return res.status(500).send('Error registering pre-existing playlist songs.');
     }
 });
 
@@ -205,16 +263,7 @@ async function registerVotelist(playlistID, playlistName, userId) {
             [playlistID, playlistName, userId]
         );
 
-        // // Insert into Collaborators
-        // const collaboratorResult = await pgClient.query(
-        //     `INSERT INTO Collaborators (playlist_id, user_id) 
-        //      VALUES ($1, $2) RETURNING *;`,
-        //     [playlistID, userId]
-        // );
-
         await pgClient.query('COMMIT'); // Commit transaction
-        // console.log(votelistResult.rows, collaboratorResult.rows);
-        // return { votelist: votelistResult.rows[0], collaborator: collaboratorResult.rows[0] };
         return votelistResult.rows[0];
     } catch (error) {
         await pgClient.query('ROLLBACK'); // Rollback if any error occurs
