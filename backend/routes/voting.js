@@ -28,7 +28,7 @@ router.get('/polls/:playlist_id', VerifyTokens, async (req, res) => {
         res.json(result.rows);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Server error');
+        res.status(500).send('Error retrieving polls.');
     }
 });
 
@@ -37,7 +37,22 @@ router.post('/', VerifyTokens, async (req, res) => {
     // TODO 
     const { poll_id : pollId, vote } = req.body;
     const spotifyClient = new SpotifyClient(req.cookies.access_token);
-    const userId = await spotifyClient.getUserData();
+    let userId;
+    try { // Retrieve user's id
+        const userData = await spotifyClient.getUserData();
+        userId = userData.id;
+        // console.log("/create route, userId:" + userId);
+        if (!userId) {
+            return res.status(404).send("User ID not found.");
+        }
+    } catch (error) {
+        console.error(error);
+        if (error.response?.status === 401) {
+            return res.status(401).send("Invalid or expired Spotify access token.");
+        }
+        return res.status(500).send("Failed to retrieve user's id.");
+    }
+    
     try {
         const result = await pool.query(
             `INSERT INTO Votes(poll_id, user_id, vote)
@@ -64,7 +79,12 @@ router.get('/search', AuthenticateApp, async (req, res) => {
         res.json(await spotifyClient.searchSongs(song));
     } catch (error) {
         console.error(error);
-        res.status(401).send('Error requesting from Spotify.');
+        // console.error('Error searching songs:', error.response?.data || error.message);
+        const status = 500
+        if (error.response?.status) {
+            status = error.response?.status
+        }
+        res.status(status).send('Error searching songs from spotify.');
     }
 
 })
