@@ -44,7 +44,7 @@ async function registerUser(access_token) {
     if (error.response?.status === 401) {
       // Spotify returned Unauthorized
       const err = new Error("Invalid or expired Spotify access token.");
-      err.statusCode = 401;
+      err.response = {status: 401};
       throw err;
     }
     throw new Error("Failed to get user data from spotify.")
@@ -63,7 +63,7 @@ async function registerUser(access_token) {
   } catch (error) {
     console.error(error);
     const err = new Error('Server error registering user.')
-    err.statusCode = 500;
+    err.response = {status: 500};
     throw err;
   }
 }
@@ -135,7 +135,7 @@ router.get("/callback", async (req, res) => {
       // res.json(await result);
     } catch (error) {
       console.error(error);
-      const status = error.statusCode;
+      const status = error.response.status;
       return res.status(status).send(error.message);
     }
   }
