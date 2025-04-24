@@ -3,8 +3,9 @@ import 'package:spotify_polls/widgets/control_bar.dart';
 import 'package:spotify_polls/widgets/song_cards.dart';
 import 'package:spotify_polls/widgets/custom_app_bar.dart';
 import 'package:spotify_polls/widgets/song_drawer.dart';
-import 'package:spotify_polls/widgets/media_items.dart';
+import 'package:spotify_polls/models/media_item.dart';
 import 'package:spotify_polls/widgets/voting.dart';
+import 'package:spotify_polls/pages/voting_page.dart';
 
 class LiveRoomPage extends StatefulWidget {
   const LiveRoomPage({super.key, this.title = "Live Room"});
@@ -38,7 +39,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
           SongCardData(
             songName: "Song ${_songCards.length + 1}",
             artistName: "Artist ${_songCards.length + 1}",
-            trackArt: Image.network('assets/trackArtPlaceholder.png'),
+            trackArt: "assets/trackArtPlaceholder.png",
             votes: [0, 0], // Placeholder art
           ));
     });
@@ -65,6 +66,17 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Voting(initSongCards: _songCards),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const VotingPage()),
+                    );
+                  },
+                  child: const Text("Go to Voting Page"),
+                ),
+                const SizedBox(height: 20),
                 ControlBar(size: shortestSide)
               ],
             ),
