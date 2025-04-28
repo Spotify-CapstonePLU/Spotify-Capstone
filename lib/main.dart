@@ -3,6 +3,7 @@ import 'package:spotify_polls/pages/home_page.dart';
 import 'package:provider/provider.dart';
 import 'package:spotify_polls/pages/votelists_page.dart';
 import 'package:spotify_polls/services/auth_service.dart';
+import 'package:spotify_polls/services/snackbar_service.dart';
 import '../styles/themes.dart' as theme;
 
 void main() {
@@ -28,6 +29,8 @@ class MyApp extends StatelessWidget {
 
             return auth.isAuthenticated ? const VotelistsPage() : const HomePage();
           },
-        ));
+        ),
+        scaffoldMessengerKey: SnackbarService.messengerKey,
+    );
   }
 }
