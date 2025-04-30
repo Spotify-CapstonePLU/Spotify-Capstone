@@ -21,6 +21,7 @@ class _LiveLoginPageState extends State<LiveLoginPage> {
   inputField() {
     return TextFormField(
       controller: myController,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         errorText: isWrong ? "Wrong Password" : null,
         hintText: "Room Code",

@@ -95,6 +95,7 @@ class _SearchItemsState extends State<SearchItems> {
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               TextField(
                 controller: searchController,
+                style: const TextStyle(color : Color(0xffffffff)),
                 decoration: InputDecoration(
                   hintText: "Search for a song...",
                   prefixIcon: const Icon(Icons.search),
