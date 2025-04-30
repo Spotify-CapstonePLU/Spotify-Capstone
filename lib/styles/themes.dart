@@ -35,15 +35,20 @@ ThemeData get defaultTheme {
     appBarTheme: const AppBarTheme(
       backgroundColor: Color(0xFFB7CBF6),
     ),
+    inputDecorationTheme: const InputDecorationTheme(
+      filled: true,
+      fillColor: Color(0xff454082),
+      hintStyle: TextStyle(color: Colors.white),
+    ),
     textTheme: const TextTheme(
       headlineLarge: TextStyle(fontSize: 64.0, color: Colors.white),
       headlineMedium: TextStyle(
           fontSize: 24.0,
           color: Colors.white), // Replace all text styles with custom values
       headlineSmall: TextStyle(fontSize: 16.0, color: Colors.white),
-      bodyLarge: TextStyle(),
-      bodyMedium: TextStyle(),
-      bodySmall: TextStyle(),
+      bodyLarge: TextStyle(color: Colors.white),
+      bodyMedium: TextStyle(color: Colors.white),
+      bodySmall: TextStyle(color: Colors.white),
     ),
 
   );
