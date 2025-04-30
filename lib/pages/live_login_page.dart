@@ -19,11 +19,14 @@ class _LiveLoginPageState extends State<LiveLoginPage> {
   final myController = TextEditingController();
   bool isWrong = false;
   inputField() {
-    return TextFormField(
-      controller: myController,
-      decoration: InputDecoration(
-        errorText: isWrong ? "Wrong Password" : null,
-        hintText: "Room Code",
+    return SizedBox(
+      width: 750,
+      child: TextFormField(
+        controller: myController,
+        decoration: InputDecoration(
+          errorText: isWrong ? "Wrong Password" : null,
+          hintText: "Room Code",
+        ),
       ),
     );
   }
@@ -53,7 +56,9 @@ class _LiveLoginPageState extends State<LiveLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: widget.title,),
+      appBar: CustomAppBar(
+        title: widget.title,
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
