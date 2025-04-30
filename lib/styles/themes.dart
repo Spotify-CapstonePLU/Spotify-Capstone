@@ -25,6 +25,16 @@ ThemeData get defaultTheme {
 
       ),
     ),
+    dialogTheme : const DialogTheme(
+      backgroundColor: Color(0xFF181B56),
+    ),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      foregroundColor: Colors.white,
+      backgroundColor: Color(0xFF5D6ABF),
+    ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Color(0xFFB7CBF6),
+    ),
     textTheme: const TextTheme(
       headlineLarge: TextStyle(fontSize: 64.0, color: Colors.white),
       headlineMedium: TextStyle(
@@ -35,5 +45,6 @@ ThemeData get defaultTheme {
       bodyMedium: TextStyle(),
       bodySmall: TextStyle(),
     ),
+
   );
 }

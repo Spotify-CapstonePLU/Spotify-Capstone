@@ -83,13 +83,6 @@ class _SongCardListState extends State<SongCardList> {
             ],
           ),
         ),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          ElevatedButton(
-            onPressed: widget.onAdd,
-            child: Text("Add Song",
-                style: TextStyle(fontSize: containerWidth * 0.03)),
-          ),
-        ]),
       ],
     );
   }

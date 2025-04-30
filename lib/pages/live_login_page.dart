@@ -60,11 +60,6 @@ class _LiveLoginPageState extends State<LiveLoginPage> {
           children: <Widget>[
             inputField(),
             displayInputFieldValueSubmit(),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('back button'))
           ],
         ),
       ),
