@@ -19,7 +19,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Container(
           constraints: BoxConstraints(
@@ -82,14 +81,12 @@ class ButtonSection extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           TextButton(
-              style: Theme.of(context).textButtonTheme.style,
               onPressed: () {
                 log("clicked Sign In");
                 ApiService.getSpotifyAuthorization(context);
               },
               child: const Text(constants.signIn)),
           TextButton(
-              style: Theme.of(context).textButtonTheme.style,
               onPressed: () {
                 log("clicked Join Live");
                 Navigator.push(
