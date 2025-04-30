@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spotify_polls/widgets/song_cards.dart';
 
 class Voting extends StatefulWidget {
-  const Voting({super.key,
-  required this.initSongCards});
+  const Voting({super.key, required this.initSongCards});
 
   final List<SongCardData> initSongCards;
 
@@ -14,7 +13,11 @@ class Voting extends StatefulWidget {
 class _VotingState extends State<Voting> {
   late List<SongCardData> _songCards;
 
-  @override @override
+  bool acceptedX = false;
+  bool acceptedY = false;
+
+  @override
+  @override
   void initState() {
     super.initState();
     _songCards = List.from(widget.initSongCards);
@@ -28,7 +31,7 @@ class _VotingState extends State<Voting> {
             songName: "Song ${_songCards.length + 1}",
             artistName: "Artist ${_songCards.length + 1}",
             trackArt: "assets/trackArtPlaceholder.png",
-            votes: [0, 0],// Placeholder art
+            votes: [0, 0], // Placeholder art
           ));
     });
   }
@@ -36,6 +39,7 @@ class _VotingState extends State<Voting> {
   void voteYes() {
     _songCards[_songCards.length - 1].votes[0] += 1;
   }
+
   void voteNo() {
     _songCards[_songCards.length - 1].votes[1] += 1;
   }
@@ -50,9 +54,10 @@ class _VotingState extends State<Voting> {
             return Container(
               width: 200,
               height: 200,
-              color: candidateData.isNotEmpty ? Colors.green : Colors.red,
+              color: candidateData.isNotEmpty ? const Color(0xff2036e1) : const Color(0xff6e43ec),
               child: Center(
-                child: Text(
+                child: acceptedY ? const Icon(Icons.check, color: Colors.white, size: 75)
+                : Text(
                   candidateData.isNotEmpty
                       ? 'Hovering: ${candidateData.first}' // Access the first item in the list
                       : 'Drag an item here!',
@@ -66,6 +71,9 @@ class _VotingState extends State<Voting> {
             return true; // Indicate whether to accept the draggable item
           },
           onAcceptWithDetails: (data) {
+            setState(() {
+              acceptedY = true;
+            });
             voteYes();
             // print('Accepted: $data');
           },
@@ -76,9 +84,10 @@ class _VotingState extends State<Voting> {
             return Container(
               width: 200,
               height: 200,
-              color: candidateData.isNotEmpty ? Colors.green : Colors.red,
+              color: candidateData.isNotEmpty ? const Color(0xff7e0202) : const Color(0xffbf1212),
               child: Center(
-                child: Text(
+                child: acceptedX ? const Icon(Icons.close, color: Colors.white, size: 75)
+                : Text(
                   candidateData.isNotEmpty
                       ? 'Hovering: ${candidateData.first}' // Access the first item in the list
                       : 'Drag an item here!',
@@ -92,6 +101,9 @@ class _VotingState extends State<Voting> {
             return true; // Indicate whether to accept the draggable item
           },
           onAcceptWithDetails: (data) {
+            setState(() {
+              acceptedX = true;
+            });
             voteNo();
             // print('Accepted: $data');
           },
