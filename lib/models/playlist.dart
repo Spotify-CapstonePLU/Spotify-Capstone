@@ -7,7 +7,9 @@ class Playlist extends MediaItemData {
   const Playlist({
     required this.playlistId,
     required super.title,
-    required super.details
+    required super.details,
+    super.imageUrl,
+    super.onTap,
   });
 
   factory Playlist.fromJson(Map<String, dynamic> json) {
