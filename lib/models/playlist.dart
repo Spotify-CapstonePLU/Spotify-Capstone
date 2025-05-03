@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:spotify_polls/models/media_item.dart';
 
 class Playlist extends MediaItemData {
