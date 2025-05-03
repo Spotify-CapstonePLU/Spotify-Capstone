@@ -14,13 +14,15 @@ class Playlist extends MediaItemData {
 
   factory Playlist.fromJson(Map<String, dynamic> json) {
     return Playlist(
-        title: json['playlist_name'],
-        details: '',
-        playlistId: json['playlist_id'],);
+      title: json['name'],
+      details: '',
+      playlistId: json['id'],
+      imageUrl: json['imageUrl'] ?? MediaItemData.defaultImageUrl,
+    );
   }
 
   @override
   String toString() {
-    return '[Title: $title, Details: $details, ItemId: $playlistId]';
+    return '[Title: $title, Details: $details, ItemId: $playlistId, imageUrl: $imageUrl]';
   }
 }
