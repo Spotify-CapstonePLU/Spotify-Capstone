@@ -276,7 +276,19 @@ router.get('/playlists', VerifyTokens, async (req, res) => {
     const access_token = req.cookies.access_token;
     const spotifyClient = new SpotifyClient(access_token);
     try {
-        res.json(await spotifyClient.getUserPlaylists())
+        const playlistData = await spotifyClient.getUserPlaylists();
+        // const nextUrl = playlistData.next
+        const playlistsJson = playlistData.items.map((playlist) => {
+            const imageUrl = playlist.images?.[0]?.url ?? null;
+
+            return {
+                id: playlist.id, 
+                name: playlist.name, 
+                imageUrl
+            };
+        })
+        console.log("playlistsJson:", playlistsJson)
+        res.json(await playlistsJson)
     } catch (error) {
         console.error(error);
         return res.status(500).send("Error requesting user's playlists from Spotify.");
