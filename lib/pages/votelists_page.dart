@@ -9,6 +9,7 @@ import 'package:spotify_polls/pages/live_login_page.dart';
 import 'package:spotify_polls/widgets/media_item_list.dart';
 import 'package:spotify_polls/models/media_item.dart';
 import 'package:spotify_polls/pages/voting_page.dart';
+import 'package:spotify_polls/models/playlist.dart';
 
 class VotelistsPage extends StatefulWidget {
   const VotelistsPage({super.key, this.title = "Votelists Page"});
@@ -21,19 +22,7 @@ class VotelistsPage extends StatefulWidget {
 
 class _VotelistsPageState extends State<VotelistsPage> {
   late Future<List<Votelist>> _votelistFuture;
-  //List<Votelist> votelists = [];
-  List<MediaItemData> playlists = [
-    const MediaItemData(
-        title: "playlist1",
-        details: "playlist1 details",
-        imageUrl:
-            'https://th.bing.com/th/id/R.e78f8e7c326d3e7cdcf053d58f494542?rik=bXopo7rm0XIdFQ&riu=http%3a%2f%2fupload.wikimedia.org%2fwikipedia%2fcommons%2fc%2fc7%2fDomestic_shorthaired_cat_face.jpg&ehk=NByReFekRNa%2fCe0v9gNPEb0tpYmVhy4kI5uaC1l1AUI%3d&risl=1&pid=ImgRaw&r=0'),
-    const MediaItemData(
-        title: "playlist2",
-        details: "playlist2 details",
-        imageUrl:
-            'https://static.scientificamerican.com/sciam/cache/file/2AE14CDD-1265-470C-9B15F49024186C10_source.jpg?w=1200'),
-  ];
+  late Future<List<Playlist>> _playlistFuture;
   bool _isBlurred = false;
 
   @override
@@ -144,17 +133,39 @@ class _VotelistsPageState extends State<VotelistsPage> {
                   const SizedBox(height: 20),
                   SizedBox(
                     height: screenHeight * 0.7,
-                    child: MediaItemList(listData: [
-                      for (var itemData in playlists)
-                        MediaItemData(
-                          title: itemData.title,
-                          details: itemData.details,
-                          imageUrl: itemData.imageUrl,
-                          onTap: () {
-                            Navigator.of(context).pop(itemData);
-                          },
-                        )
-                    ]),
+                    child: FutureBuilder<List<Playlist>>(
+                      future: _playlistFuture,
+                      builder: (context, snapshot) {
+                        if(snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));
+                        } else if (snapshot.hasData) {
+                          List<Playlist> playlists = snapshot.data!;
+
+                          if(playlists.isEmpty) {
+                            return const Center(child: Text('You have no Spotify playlists!'));
+                          } else {
+                            return Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: MediaItemList(
+                                listData: [
+                                  for (var itemData in playlists)
+                                    MediaItemData(
+                                        title: itemData.title,
+                                        details: itemData.details,
+                                        imageUrl: itemData.imageUrl,
+                                        onTap: () => Navigator.of(context).pop(itemData)
+                                    )
+                                ],
+                              ),
+                            );
+                          }
+                        } else {
+                          return const Center(child: Text('You have no Spotify playlists!'));
+                        }
+                      },
+                    ),
                   ),
                   TextButton(
                     onPressed: () {
@@ -250,6 +261,7 @@ class _VotelistsPageState extends State<VotelistsPage> {
                           const SizedBox(height: 10),
                           ElevatedButton(
                               onPressed: () {
+                                _playlistFuture = VotelistController().getUserPlaylists();
                                 showRegisterPopup(context);
                                 log("Register Votelist pressed");
                               },
