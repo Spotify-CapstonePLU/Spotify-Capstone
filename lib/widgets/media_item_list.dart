@@ -28,7 +28,7 @@ class _MediaItemListState extends State<MediaItemList> {
     return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.blueAccent),
+          border: Border.all(),
         ),
         child: ClipRRect(
             child: Padding(
