@@ -9,7 +9,8 @@ import '../widgets/song_drawer.dart';
 import '../widgets/sort_songs.dart';
 
 class VotingPage extends StatefulWidget {
-  const VotingPage({super.key, this.title = "Voting Page"});
+  const VotingPage({super.key, this.title = "Voting Page", required this.votelistId});
+  final String votelistId;
   final String title;
 
   @override
@@ -78,6 +79,14 @@ class _VotingPageState extends State<VotingPage> {
         );
       },
     );
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // websocket for getting polls
+    // websocket for voting
   }
 
   @override
