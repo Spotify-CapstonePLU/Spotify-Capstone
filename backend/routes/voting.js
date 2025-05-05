@@ -33,6 +33,7 @@ router.get('/polls/:playlist_id', VerifyTokens, async (req, res) => {
 });
 
 // Insert/update row in votes table(whenever a vote is made)
+// should be websocket
 router.post('/', VerifyTokens, async (req, res) => {
     // TODO 
     const { poll_id : pollId, vote } = req.body;
