@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import router from '../routes/auth.js';
 
 const routerWs = Router();
 
@@ -50,3 +51,4 @@ routerWs.ws('/voting', (ws, req) => {
   });
 });
 
+export default routerWs;
