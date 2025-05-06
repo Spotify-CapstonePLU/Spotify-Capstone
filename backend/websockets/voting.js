@@ -2,6 +2,7 @@ import { Router } from 'express';
 import router from '../routes/auth.js';
 
 const routerWs = Router();
+routerWs.use(cookieParser())
 
 routerWs.ws('/voting', (ws, req) => {
   console.log('WebSocket /voting connected');
