@@ -25,7 +25,7 @@ class Song extends MediaItemData {
 
     return Song(
         title: json['name'] as String,
-        details: 'Song',
+        details: artistName,
         songId: json['id'],
         artist: artistName,
         imageUrl: imageUrl);

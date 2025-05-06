@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:spotify_polls/models/song.dart';
 import 'package:spotify_polls/widgets/media_item_list.dart';
 import 'package:spotify_polls/models/media_item.dart';
 import 'package:spotify_polls/controllers/voting_controller.dart';
@@ -23,7 +24,7 @@ class SearchItems extends StatefulWidget {
 class _SearchItemsState extends State<SearchItems> {
   Timer? _debounce;
   //List<MediaItemData> allMediaItems = [];
-  List<MediaItemData> searchResults = [];
+  List<Song> searchResults = [];
   final TextEditingController searchController = TextEditingController();
 
   @override
