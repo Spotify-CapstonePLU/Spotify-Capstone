@@ -85,8 +85,8 @@ class _VotingPageState extends State<VotingPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // websocket for getting polls
-    // websocket for voting
+    // connect to websocket for getting polls
+    // connect to websocket for voting
   }
 
   @override
