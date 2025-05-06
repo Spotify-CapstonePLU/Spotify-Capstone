@@ -3,6 +3,7 @@ import 'dart:html';
 
 import 'package:flutter/cupertino.dart';
 import 'package:spotify_polls/models/song.dart';
+import 'package:spotify_polls/services/snackbar_service.dart';
 import 'package:spotify_polls/services/voting_websocket_service.dart';
 
 class VotingController with ChangeNotifier{
@@ -19,6 +20,12 @@ class VotingController with ChangeNotifier{
       final decoded = jsonDecode(data);
       if (decoded['type'] == 'vote_ack') {
         _messages.add("ACK: ${decoded['message']}");
+        SnackbarService.showSuccess(decoded['message']);
+        notifyListeners();
+      }
+      else {
+        _messages.add("Error: ${decoded['message']}");
+        SnackbarService.showSuccess(decoded['message']);
         notifyListeners();
       }
     });
