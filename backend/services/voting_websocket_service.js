@@ -1,5 +1,3 @@
-
-import cookieParser from 'cookie-parser';
 import pg from 'pg';
 import { SpotifyClient } from '../clients/spotify_client.js';
 
