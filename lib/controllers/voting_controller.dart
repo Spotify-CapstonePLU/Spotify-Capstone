@@ -17,7 +17,7 @@ class VotingController with ChangeNotifier{
     _wsService.connect();
     _wsService.stream.listen((data) {
       final decoded = jsonDecode(data);
-      if (decoded['type'] == 'ack') {
+      if (decoded['type'] == 'vote_ack') {
         _messages.add("ACK: ${decoded['message']}");
         notifyListeners();
       }
