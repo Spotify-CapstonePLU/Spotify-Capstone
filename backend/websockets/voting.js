@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import router from '../routes/auth.js';
 
 const routerWs = Router();
 routerWs.use(cookieParser())
