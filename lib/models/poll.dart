@@ -1,6 +1,3 @@
-import 'package:spotify_polls/models/media_item.dart';
-import 'package:spotify_polls/models/postgres_interval.dart';
-
 class Poll {
   final String playlistId;
   final String pollId;
