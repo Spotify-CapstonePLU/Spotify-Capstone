@@ -75,11 +75,32 @@ export class SpotifyClient {
     async getUserPlaylistSongs(playlistId) {
         try {
             const response = await this.api.get(`/playlists/${playlistId}`, {
-                params: { fields: 'tracks.items(track(album.name, name, id, artists.name, duration_ms))'}
+                params: { fields: 'tracks.items(track(album.name, name, id, artists.name, duration_ms))' }
             });
             return response.data;
         } catch (error) {
             console.error('Error fetching playlist songs:', error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    async getSongsById(songIds) {
+        try {
+            const response = await this.api.get('/tracks', {
+                params: {
+                    ids: songIds.join(',')
+                }
+            });
+
+            const tracks = await response.data.tracks.map((track) => ({
+                id: track.id,
+                name: track.name,
+                imageUrl: track.album.images?.[0]?.url
+            }))
+
+            return tracks;
+        } catch (error) {
+            console.error('Error fetching songs by id:', error.response?.data || error.message);
             throw error;
         }
     }
