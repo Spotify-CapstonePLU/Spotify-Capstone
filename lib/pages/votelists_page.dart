@@ -218,15 +218,15 @@ class _VotelistsPageState extends State<VotelistsPage> {
                             padding: const EdgeInsets.all(12),
                             child: MediaItemList(
                               listData: [
-                                for (var itemData in votelists)
+                                for (var votelist in votelists)
                                   MediaItemData(
-                                    title: itemData.title, 
-                                    details: itemData.details,
-                                    imageUrl: itemData.imageUrl,
+                                    title: votelist.title,
+                                    details: votelist.details,
+                                    imageUrl: votelist.imageUrl,
                                     onTap: () => Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const VotingPage()
+                                        builder: (context) => VotingPage(playlistId: votelist.playlistId,)
                                       )
                                     ))
                               ],
