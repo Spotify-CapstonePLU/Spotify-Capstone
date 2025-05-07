@@ -1,42 +1,68 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:universal_html/html.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:spotify_polls/models/song.dart';
-import 'package:spotify_polls/services/snackbar_service.dart';
-import 'package:spotify_polls/services/voting_websocket_service.dart';
+import 'package:spotify_polls/services/websocket_service.dart';
 
-class VotingController with ChangeNotifier{
+import '../models/poll.dart';
+
+class VotingController with ChangeNotifier {
   static const String baseUrl = 'http://127.0.0.1:3000';
-  final VotingWebSocketService _wsService = VotingWebSocketService();
-  final List<String> _messages = [];
+  final WebSocketService _pollWsService = WebSocketService();
+  final WebSocketService _votingWsService = WebSocketService();
+  final StreamController<String> _pollMessagesController =
+      StreamController<String>.broadcast();
 
+  Stream<String> get messages => _pollMessagesController.stream;
 
-  List<String> get messages => List.unmodifiable(_messages);
+  void connectSockets() {
+    _pollWsService.connect("$baseUrl/voting/polls");
+    _votingWsService.connect("$baseUrl/voting");
 
-  void connectSocket() {
-    _wsService.connect();
-    _wsService.stream.listen((data) {
+    _pollWsService.stream.listen((data) {
       final decoded = jsonDecode(data);
-      if (decoded['type'] == 'vote_ack') {
-        _messages.add("ACK: ${decoded['message']}");
-        SnackbarService.showSuccess(decoded['message']);
-        notifyListeners();
-      }
-      else {
-        _messages.add("Error: ${decoded['message']}");
-        SnackbarService.showSuccess(decoded['message']);
-        notifyListeners();
-      }
+      print(decoded);
+      // if (decoded['type'] == 'poll_data') {
+      //   _pollMessagesController.add(decoded['message']);
+      // }
     });
   }
 
-  void send(String message) {
-    _wsService.send(message);
+  void disconnectSockets() {
+    _pollWsService.disconnect();
+    _votingWsService.disconnect();
   }
 
-  void disconnectSocket() {
-    _wsService.disconnect();
+  // should be websocket
+  void castVote(String vote, String pollId) async {
+    final message = {
+      "type": vote,
+      "pollId": pollId,
+      "id": DateTime.now().millisecondsSinceEpoch.toString() // simple unique ID
+    };
+
+    _votingWsService.send(jsonEncode(message));
+  }
+
+  Future<List<Poll>> getPolls(String playlistId) async {
+    final request = await HttpRequest.request(
+      '$baseUrl/voting/polls/$playlistId',
+      method: 'GET',
+      requestHeaders: {'Content-Type': 'application/json'},
+      withCredentials: true,
+    );
+
+    if (request.status! < 400 && request.status! >= 100) {
+      final List<dynamic> data = jsonDecode(request.responseText!);
+      final polls = data.map((item) => Poll.fromJson(item)).toList();
+      print(polls.toString());
+      return polls;
+    } else {
+      print('Failed with status: ${request.status}');
+      return [];
+    }
   }
 
   Future<bool> createPoll(String songId, String playlistId) async {
@@ -58,27 +84,14 @@ class VotingController with ChangeNotifier{
     }
   }
 
-  // should be websocket
-  void castVote(String vote, String pollId) async {
-    final message = {
-      "type": vote,
-      "pollId": pollId,
-      "id": DateTime.now().millisecondsSinceEpoch.toString() // simple unique ID
-    };
-
-    _wsService.send(jsonEncode(message));
-  }
-
   Future<List<Song>> searchSongs(String query) async {
     final uri = Uri.parse('$baseUrl/voting/search')
         .replace(queryParameters: {'song': query});
 
-    final response = await HttpRequest.request(
-        uri.toString(),
+    final response = await HttpRequest.request(uri.toString(),
         method: 'GET',
         requestHeaders: {'Content-Type': 'application/json'},
-        withCredentials: true
-    );
+        withCredentials: true);
 
     if (response.status == 200) {
       return Song.parseSongFromSearchResults(response.responseText!);
