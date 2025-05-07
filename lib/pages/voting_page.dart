@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:spotify_polls/controllers/voting_controller.dart';
 import 'package:spotify_polls/widgets/custom_app_bar.dart';
 import 'package:spotify_polls/widgets/song_cards.dart';
 import 'package:spotify_polls/models/media_item.dart';
 import 'package:spotify_polls/widgets/search_items.dart';
 import 'package:spotify_polls/widgets/voting.dart';
 
+import '../models/poll.dart';
 import '../widgets/song_drawer.dart';
 import '../widgets/sort_songs.dart';
 
 class VotingPage extends StatefulWidget {
-  const VotingPage({super.key, this.title = "Voting Page", required this.votelistId});
-  final String votelistId;
+  const VotingPage({super.key, this.title = "Voting Page", required this.playlistId});
+  final String playlistId;
   final String title;
 
   @override
@@ -19,6 +21,7 @@ class VotingPage extends StatefulWidget {
 
 class _VotingPageState extends State<VotingPage> {
   final List<SongCardData> _songCards = [];
+  late Future<List<Poll>> _pollsFuture;
   late Key _votingWidgetKey = UniqueKey();
 
   List<MediaItemData> get mediaItems => _songCards.map((song) =>
@@ -83,10 +86,17 @@ class _VotingPageState extends State<VotingPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _pollsFuture = VotingController().getPolls(widget.playlistId);
+    VotingController().connectSockets();
     // connect to websocket for getting polls
     // connect to websocket for voting
+  }
+
+  @override
+  void dispose() {
+    VotingController().disconnectSockets();
+    super.dispose();
   }
 
   @override
