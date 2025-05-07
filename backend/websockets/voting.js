@@ -30,7 +30,7 @@ routerWs.ws('/polls', (ws) => {
 });
 
 
-routerWs.ws('/voting', (ws, req) => {
+routerWs.ws('/', (ws, req) => {
   console.log('WebSocket /voting connected');
   votingClients.add(ws)
   ws.on('message', async (msg) => {
