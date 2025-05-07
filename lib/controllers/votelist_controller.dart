@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:html';
+import 'package:universal_html/html.dart';
 
 import 'package:spotify_polls/models/votelist.dart';
 import 'package:spotify_polls/models/playlist.dart';

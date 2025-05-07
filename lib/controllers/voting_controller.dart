@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:html';
+import 'package:universal_html/html.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:spotify_polls/models/song.dart';
