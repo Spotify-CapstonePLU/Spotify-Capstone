@@ -22,7 +22,6 @@ class VotingPage extends StatefulWidget {
 class _VotingPageState extends State<VotingPage> {
   final List<SongCardData> _songCards = [];
   late Future<List<Poll>> _pollsFuture;
-  late Key _votingWidgetKey = UniqueKey();
 
   List<MediaItemData> get mediaItems => _songCards.map((song) =>
       MediaItemData(
@@ -31,22 +30,6 @@ class _VotingPageState extends State<VotingPage> {
         imageUrl: song.imageUrl,
       )
   ).toList();
-
-  void _onMediaItemSelected(MediaItemData selectedMedia) {
-    print("Song added: ${selectedMedia.title}");
-    setState(() {
-      _songCards.insert(
-        0,
-        SongCardData(
-          songName: selectedMedia.title,
-          artistName: selectedMedia.details,
-          trackArt: selectedMedia.imageUrl,
-          votes: [0, 0],
-        ),
-      );
-      _votingWidgetKey = UniqueKey();
-    });
-  }
 
   void _sortSongs() {
     showDialog(
@@ -78,7 +61,7 @@ class _VotingPageState extends State<VotingPage> {
       context: context,
       builder: (BuildContext context) {
         return SearchItems(
-          onMediaItemSelected: _onMediaItemSelected,
+          playlistId: widget.playlistId,
         );
       },
     );
@@ -108,7 +91,33 @@ class _VotingPageState extends State<VotingPage> {
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Voting(key: _votingWidgetKey, initSongCards: _songCards),
+              FutureBuilder<List<Poll>>(
+                  future: _pollsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (snapshot.hasData) {
+                      List<Poll> polls = snapshot.data!;
+
+                      if (polls.isEmpty) {
+                        return const Center(
+                            child: Text('There are no songs to vote on.'));
+                      } else {
+                        return Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Voting(polls: polls),
+                        );
+                      }
+                    } else {
+                      return const Center(
+                        child: Text("There are no songs to vote on."),
+                      );
+                    }
+                  }
+              ),
+
               ElevatedButton(
                 onPressed: _sortSongs,
                 child: const Text("Sort Songs"),
