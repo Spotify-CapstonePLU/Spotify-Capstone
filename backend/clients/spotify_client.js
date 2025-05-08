@@ -52,7 +52,7 @@ export class SpotifyClient {
     // Get user's playlists
     async getUserPlaylists() {
         try {
-            const response = await this.api.get('/me/playlists?limit=50');
+            const response = await this.api.get('/me/playlists?limit=50&offset=0');
             return response.data;
         } catch (error) {
             console.error('Error fetching playlists:', error.response?.data || error.message);
