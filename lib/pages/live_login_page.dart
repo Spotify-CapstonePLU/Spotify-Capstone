@@ -64,6 +64,7 @@ class _LiveLoginPageState extends State<LiveLoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             inputField(),
+            const SizedBox(height: 16),
             displayInputFieldValueSubmit(),
           ],
         ),
