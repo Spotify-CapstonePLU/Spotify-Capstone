@@ -26,7 +26,7 @@ router.get('/', VerifyTokens, async (req, res) => {
     const spotifyClient = new SpotifyClient(req.cookies.access_token);
     try { // Retrieve user's id
         const userData = await spotifyClient.getUserData();
-        const userId = userData.id;
+        userId = userData.id;
         // console.log("/ route, userId:" + userId);
 
         if (!userId) {
@@ -59,8 +59,6 @@ router.get('/', VerifyTokens, async (req, res) => {
         return res.status(500).send('Server error getting votelists.');
     }
 });
-
-
 
 // Create a new Spotify playlist
 router.post('/create', VerifyTokens, async (req, res) => {
