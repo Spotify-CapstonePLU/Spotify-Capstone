@@ -45,7 +45,6 @@ class _VotingPageState extends State<VotingPage> {
                 setState(() {
                   _songCards.remove(songCardData);
                   _songCards.add(songCardData);
-                  _votingWidgetKey = UniqueKey();
                 });
                 Navigator.pop(context);
               },
