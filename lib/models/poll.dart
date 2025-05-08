@@ -1,7 +1,10 @@
+import 'package:spotify_polls/models/song.dart';
+
 class Poll {
   final String playlistId;
   final String pollId;
   final String songId;
+  final Song song;
   final String type;
   final int upvotes;
   final int downvotes;
@@ -12,6 +15,7 @@ class Poll {
     required this.playlistId,
     required this.pollId,
     required this.songId,
+    required this.song,
     required this.type,
     required this.upvotes,
     required this.downvotes,
@@ -24,6 +28,7 @@ class Poll {
         playlistId: json['playlist_id'],
         pollId: json['poll_id'],
         songId: json['song_id'],
+        song: Song.fromJson(json['song']),
         type: json['type'],
         upvotes: json['upvotes'],
         downvotes: json['downvotes'],
