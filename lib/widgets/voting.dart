@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_polls/widgets/song_cards.dart';
 
+import '../models/poll.dart';
+
 class Voting extends StatefulWidget {
   const Voting({super.key,
-  required this.initSongCards});
+  required this.polls});
 
-  final List<SongCardData> initSongCards;
+  final List<Poll> polls;
 
   @override
   State<StatefulWidget> createState() => _VotingState();
@@ -17,7 +19,15 @@ class _VotingState extends State<Voting> {
   @override @override
   void initState() {
     super.initState();
-    _songCards = List.from(widget.initSongCards);
+    _songCards = widget.polls.map((poll) {
+
+      return SongCardData(
+        songName: poll.song.title,
+        artistName: poll.song.artist,
+        trackArt: poll.song.imageUrl,
+        votes: [poll.upvotes.toDouble(), poll.downvotes.toDouble()],
+      );
+    }).whereType<SongCardData>().toList();
   }
 
   void _addSong() {
