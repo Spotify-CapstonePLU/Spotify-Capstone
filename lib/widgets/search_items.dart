@@ -1,20 +1,21 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:spotify_polls/widgets/media_item_list.dart';
 import 'package:spotify_polls/models/media_item.dart';
 import 'package:spotify_polls/controllers/voting_controller.dart';
 
+import '../models/song.dart';
+
 class SearchItems extends StatefulWidget {
   const SearchItems({
     super.key,
     this.title = "Search for Songs",
-    required this.onMediaItemSelected,
+    this.playlistId = "",
   });
   final String title;
+  final String playlistId;
 
-  final Function(MediaItemData) onMediaItemSelected;
 
   @override
   State<SearchItems> createState() => _SearchItemsState();
@@ -30,39 +31,35 @@ class _SearchItemsState extends State<SearchItems> {
   void initState() {
     super.initState();
 
-    // List<MediaItemData> baseItems = [
-    //   const MediaItemData(
-    //     title: "Song A",
-    //     details: "Artist X",
-    //     imageUrl:
-    //         "https://upload.wikimedia.org/wikipedia/commons/c/c7/Domestic_shorthaired_cat_face.jpg",
-    //   ),
-    //   const MediaItemData(
-    //     title: "Song B",
-    //     details: "Artist Y",
-    //   ),
-    // ];
+  }
 
-    // allMediaItems = baseItems.map((item) {
-    //   return MediaItemData(
-    //     title: item.title,
-    //     details: item.details,
-    //     imageUrl: item.imageUrl,
-    //     onTap: () {
-    //       widget.onMediaItemSelected(item);
-    //       Navigator.pop(context);
-    //     },
-    //   );
-    // }).toList();
+  MediaItemData songToMedia(Song song) {
+    return MediaItemData(
+      title: song.title,
+      details: '${song.details} by ${song.artist}',
+      imageUrl: song.imageUrl,
+      onTap: () {
+        void handleCreatePoll() async {
+          print("attempt to create poll");
+          bool success = await VotingController().createPoll(song.songId, widget.playlistId);
 
-    // filteredItems = List.from(allMediaItems);
+          if (success) {
+            print('Poll created successfully!');
+            // You can also update the UI with setState here if needed
+          } else {
+            print('Failed to create poll.');
+          }
+        }
+        handleCreatePoll();
+      },
+    );
   }
 
   Future<void> search(String query) async {
     try {
       final response = await VotingController().searchSongs(query);
       setState(() {
-        searchResults = response;
+        searchResults = response.map(songToMedia).toList();
       });
       print('Finished search');
     } catch (error) {
@@ -117,9 +114,3 @@ class _SearchItemsState extends State<SearchItems> {
             ])));
   }
 }
-//
-// class SongOptions{
-//   String songName;
-//   String artist;
-//   SongOptions({this.songName, this.artist})
-// }
