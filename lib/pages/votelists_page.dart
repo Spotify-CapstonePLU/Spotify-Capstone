@@ -30,9 +30,17 @@ class _VotelistsPageState extends State<VotelistsPage> {
     super.initState();
     _votelistFuture = VotelistController().getVotelists();
   }
-
-  void addNewVotelist(String name) {
+  
+  void addCreateVotelist(String name) {
     VotelistController().createVotelist(name);
+    setState(() {
+      _votelistFuture = VotelistController().getVotelists();
+    });
+  }
+  
+  void addRegsiterVotelist(Playlist playlist) {
+    print("playlist stuff: ${playlist.playlistId}, ${playlist.title}");
+    VotelistController().registerVotelist(playlist.playlistId, playlist.title);
     setState(() {
       _votelistFuture = VotelistController().getVotelists();
     });
@@ -102,7 +110,7 @@ class _VotelistsPageState extends State<VotelistsPage> {
     );
 
     if (result != null) {
-      addNewVotelist(result);
+      addCreateVotelist(result);
     }
 
     _toggleBlur();
@@ -117,7 +125,7 @@ class _VotelistsPageState extends State<VotelistsPage> {
     final double rightPadding = MediaQuery.of(context).viewPadding.right;
 
     void showRegisterPopup(BuildContext context) async {
-      final result = await showDialog<String>(
+      final result = await showDialog<Playlist>(
         context: context,
         builder: (BuildContext context) {
           return Dialog(
@@ -181,7 +189,8 @@ class _VotelistsPageState extends State<VotelistsPage> {
       );
 
       if (result != null) {
-        addNewVotelist(result);
+        print("add playlist?");
+        addRegsiterVotelist(result);
       }
 
       _toggleBlur();
