@@ -4,8 +4,7 @@ import 'package:spotify_polls/widgets/song_cards.dart';
 import '../models/poll.dart';
 
 class Voting extends StatefulWidget {
-  const Voting({super.key,
-  required this.polls});
+  const Voting({super.key, required this.polls});
 
   final List<Poll> polls;
 
@@ -16,18 +15,20 @@ class Voting extends StatefulWidget {
 class _VotingState extends State<Voting> {
   late List<SongCardData> _songCards;
 
-  @override @override
+  @override
   void initState() {
     super.initState();
-    _songCards = widget.polls.map((poll) {
-
-      return SongCardData(
-        songName: poll.song.title,
-        artistName: poll.song.artist,
-        trackArt: poll.song.imageUrl,
-        votes: [poll.upvotes.toDouble(), poll.downvotes.toDouble()],
-      );
-    }).whereType<SongCardData>().toList();
+    _songCards = widget.polls
+        .map((poll) {
+          return SongCardData(
+            songName: poll.song.title,
+            artistName: poll.song.artist,
+            trackArt: poll.song.imageUrl,
+            votes: [poll.upvotes.toDouble(), poll.downvotes.toDouble()],
+          );
+        })
+        .whereType<SongCardData>()
+        .toList();
   }
 
   void _addSong() {
@@ -38,7 +39,7 @@ class _VotingState extends State<Voting> {
             songName: "Song ${_songCards.length + 1}",
             artistName: "Artist ${_songCards.length + 1}",
             trackArt: "assets/trackArtPlaceholder.png",
-            votes: [0, 0],// Placeholder art
+            votes: [0, 0], // Placeholder art
           ));
     });
   }
@@ -46,6 +47,7 @@ class _VotingState extends State<Voting> {
   void voteYes() {
     _songCards[_songCards.length - 1].votes[0] += 1;
   }
+
   void voteNo() {
     _songCards[_songCards.length - 1].votes[1] += 1;
   }
