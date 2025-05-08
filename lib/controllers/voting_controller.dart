@@ -10,6 +10,7 @@ import '../models/poll.dart';
 
 class VotingController with ChangeNotifier {
   static const String baseUrl = 'http://127.0.0.1:3000';
+  static const String wsUrl = 'ws://127.0.0.1:3000';
   final WebSocketService _pollWsService = WebSocketService();
   final WebSocketService _votingWsService = WebSocketService();
   final StreamController<String> _pollMessagesController =
@@ -18,8 +19,8 @@ class VotingController with ChangeNotifier {
   Stream<String> get messages => _pollMessagesController.stream;
 
   void connectSockets() {
-    _pollWsService.connect("$baseUrl/voting/polls");
-    _votingWsService.connect("$baseUrl/voting");
+    _pollWsService.connect("$wsUrl/voting/polls");
+    _votingWsService.connect("$wsUrl/voting");
 
     _pollWsService.stream.listen((data) {
       final decoded = jsonDecode(data);
