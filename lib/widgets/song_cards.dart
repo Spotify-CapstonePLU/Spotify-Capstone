@@ -114,6 +114,7 @@ class _SongCardState extends State<SongCard> {
 
     return Card(
       margin: EdgeInsets.all(containerWidth * 0.01),
+      color: Colors.blue,
       elevation: 0.0,
       child: Container(
         decoration: BoxDecoration(

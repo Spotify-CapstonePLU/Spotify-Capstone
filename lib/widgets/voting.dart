@@ -13,8 +13,9 @@ class Voting extends StatefulWidget {
 class _VotingState extends State<Voting> {
   late List<SongCardData> _songCards;
 
-  bool acceptedX = false;
-  bool acceptedY = false;
+  bool isHoveringYes = false;
+  bool isHoveringNo = false;
+
 
   @override
   @override
@@ -46,66 +47,125 @@ class _VotingState extends State<Voting> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    const minScreenHeight = 675.0;
+    const minScreenWidth = 750.0;
+    final boxSizeW = screenWidth * 0.3;
+    final boxSizeH = screenHeight * 0.7;
+
+    if (screenWidth < minScreenWidth) {
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.all(24.0),
+          margin: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.black87,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Text(
+            '⚠️ Screen is too narrow for voting.\nPlease expand your window or use a larger device.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        ),
+      );
+    }
+
+    if (screenHeight < minScreenHeight) {
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.all(24.0),
+          margin: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.black87,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Text(
+            '⚠️ Screen is too small for voting.\nPlease expand your window or use a larger device.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        ),
+      );
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         DragTarget<int>(
           builder: (context, candidateData, rejectedData) {
-            return Container(
-              width: 200,
-              height: 200,
-              color: candidateData.isNotEmpty ? const Color(0xff2036e1) : const Color(0xff6e43ec),
-              child: Center(
-                child: acceptedY ? const Icon(Icons.check, color: Colors.white, size: 75)
-                : Text(
-                  candidateData.isNotEmpty
-                      ? 'Hovering: ${candidateData.first}' // Access the first item in the list
-                      : 'Drag an item here!',
-                  style: const TextStyle(color: Colors.white),
+            return AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              opacity: isHoveringYes ? 1.0 : 0.0,
+              child: Container(
+                width: boxSizeW,
+                height: boxSizeH,
+                decoration: BoxDecoration(
+                  color: const Color(0xff2036e1),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: const Center(
+                  child: Icon(Icons.check, color: Colors.white, size: 150),
                 ),
               ),
             );
           },
           onWillAcceptWithDetails: (data) {
             // print('Will accept: $data');
+            setState(() {
+              isHoveringYes = true;
+            });
             return true; // Indicate whether to accept the draggable item
           },
           onAcceptWithDetails: (data) {
             setState(() {
-              acceptedY = true;
+              isHoveringYes = false;
             });
             voteYes();
             // print('Accepted: $data');
+          },
+          onLeave: (data) {
+            setState(() {
+              isHoveringYes = false;
+            });
           },
         ),
         SongCardList(songCards: _songCards, onAdd: _addSong),
         DragTarget<int>(
           builder: (context, candidateData, rejectedData) {
-            return Container(
-              width: 200,
-              height: 200,
-              color: candidateData.isNotEmpty ? const Color(0xff7e0202) : const Color(0xffbf1212),
-              child: Center(
-                child: acceptedX ? const Icon(Icons.close, color: Colors.white, size: 75)
-                : Text(
-                  candidateData.isNotEmpty
-                      ? 'Hovering: ${candidateData.first}' // Access the first item in the list
-                      : 'Drag an item here!',
-                  style: const TextStyle(color: Colors.white),
+            return AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              opacity: isHoveringNo ? 1.0 : 0.0,
+              child: Container(
+                width: boxSizeW,
+                height: boxSizeH,
+                decoration: BoxDecoration(
+                  color: const Color(0xffbf1212), // Red background
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: const Center(
+                  child: Icon(Icons.close, color: Colors.white, size: 150),
                 ),
               ),
             );
           },
           onWillAcceptWithDetails: (data) {
-            // print('Will accept: $data');
-            return true; // Indicate whether to accept the draggable item
+            setState(() {
+              isHoveringNo = true;
+            });
+            return true;
           },
           onAcceptWithDetails: (data) {
             setState(() {
-              acceptedX = true;
+              isHoveringNo = false;
             });
             voteNo();
-            // print('Accepted: $data');
+          },
+          onLeave: (data) {
+            setState(() {
+              isHoveringNo = false;
+            });
           },
         ),
       ],
