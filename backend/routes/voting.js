@@ -139,7 +139,7 @@ router.post("/polls/create", VerifyTokens, async (req, res) => {
       return res.status(400).send("There is already an active poll.");
     }
 
-    if (!timeoutWindowElapsed) {
+    if (timeoutWindowElapsed) {
       return res.status(401).send("You must wait to start another poll.");
     }
 
