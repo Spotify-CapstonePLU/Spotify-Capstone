@@ -65,17 +65,17 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Voting(initSongCards: _songCards),
+                // Voting(initSongCards: _songCards),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const VotingPage()),
-                    );
-                  },
-                  child: const Text("Go to Voting Page"),
-                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(builder: (context) => const VotingPage()),
+                //     );
+                //   },
+                //   child: const Text("Go to Voting Page"),
+                // ),
                 const SizedBox(height: 20),
                 ControlBar(size: shortestSide)
               ],
