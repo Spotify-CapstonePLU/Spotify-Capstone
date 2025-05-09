@@ -92,9 +92,13 @@ export class SpotifyClient {
                 }
             });
 
-            const tracks = await response.data.tracks.map((track) => ({
-                id: track.id,
+            const data = await response.data;
+            console.log(data)
+            const tracks = data.tracks.map((track) => ({
+                song_id: track.id,
                 name: track.name,
+                album: track.album.name,
+                artists: track.artists.map(artist => artist.name),
                 imageUrl: track.album.images?.[0]?.url
             }))
 
