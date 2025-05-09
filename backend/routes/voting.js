@@ -20,6 +20,7 @@ router.use(cookieParser())
 router.get('/polls/:playlist_id', VerifyTokens, async (req, res) => {
   // TODO VerifyTokens
   const { playlist_id } = req.params;
+  const spotifyClient = new SpotifyClient(req.cookies.access_token);
   try {
     const result = await pool.query(`SELECT 
                                        Polls.*, 
@@ -29,7 +30,16 @@ router.get('/polls/:playlist_id', VerifyTokens, async (req, res) => {
                                      WHERE Polls.playlist_id = $1;`,
       [playlist_id]
     );
-    res.json(result.rows);
+    const songIds = result.rows.map((track) => track.song_id);
+    const images = (await spotifyClient.getSongsById(songIds)).map((track) => track.imageUrl);
+    const realResult = result.rows.map((row, index) => ({
+      ...row,
+      song: {
+        ...row.song,
+        imageUrl: images[index]
+      }
+    }));
+    res.json(realResult);
   } catch (error) {
     console.error(error);
     res.status(500).send('Error retrieving polls.');
