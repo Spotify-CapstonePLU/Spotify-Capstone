@@ -65,20 +65,25 @@ class VotingController with ChangeNotifier {
   }
 
   Future<bool> createPoll(String songId, String playlistId) async {
-    final response = await HttpRequest.request(
-      '$baseUrl/voting/polls/create',
-      method: 'POST',
-      requestHeaders: {'Content-Type': 'application/json'},
-      withCredentials: true,
-      sendData: jsonEncode({
-        'song_id': songId,
-        'playlist_id': playlistId,
-      }),
-    );
+    try {
+      final HttpRequest response = await HttpRequest.request(
+        '$baseUrl/voting/polls/create',
+        method: 'POST',
+        requestHeaders: {'Content-Type': 'application/json'},
+        withCredentials: true,
+        sendData: jsonEncode({
+          'song_id': songId,
+          'playlist_id': playlistId,
+        }),
+      );
 
-    if (response.status == 201) {
-      return true;
-    } else {
+
+      return response.status == 200;
+    } catch (error, stackTrace) {
+      print("Something went wrong while creating poll:");
+      print("Error: $error");
+      print("Stack trace: $stackTrace");
+
       return false;
     }
   }
