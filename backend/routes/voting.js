@@ -21,9 +21,12 @@ router.get('/polls/:playlist_id', VerifyTokens, async (req, res) => {
   // TODO VerifyTokens
   const { playlist_id } = req.params;
   try {
-    const result = await pool.query(`SELECT Polls.* from Polls
-                                        LEFT JOIN Songs ON Songs.song_id = Polls.song_id
-                                        WHERE Polls.playlist_id = $1`,
+    const result = await pool.query(`SELECT 
+                                       Polls.*, 
+                                       to_jsonb(Songs) AS song
+                                     FROM Polls
+                                     LEFT JOIN Songs ON Songs.song_id = Polls.song_id
+                                     WHERE Polls.playlist_id = $1;`,
       [playlist_id]
     );
     res.json(result.rows);
