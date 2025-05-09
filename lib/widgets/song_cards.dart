@@ -168,7 +168,7 @@ class _SongCardState extends State<SongCard> {
                       style: TextStyle(fontSize: containerWidth * 0.03),
                     ),
                     Text(
-                      widget.cardData.artistName,
+                      widget.cardData.artistNames,
                       style: TextStyle(fontSize: containerWidth * 0.03),
                     ),
                   ],
@@ -185,17 +185,17 @@ class _SongCardState extends State<SongCard> {
 class SongCardData extends MediaItemData{
   const SongCardData({
     required this.songName,
-    required this.artistName,
+    required this.artistNames,
     required String trackArt,
     required this.votes,
   }) : super(
     title: songName,
-    details: artistName,
+    details: artistNames,
     imageUrl: trackArt,
   );
 
   final String songName;
-  final String artistName;
+  final String artistNames;
   String get trackArt => imageUrl;
   final List<double> votes;
 }
