@@ -49,46 +49,16 @@ class _VotingState extends State<Voting> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    const minScreenHeight = 675.0;
-    const minScreenWidth = 750.0;
-    final boxSizeW = screenWidth * 0.3;
-    final boxSizeH = screenHeight * 0.7;
+    final boxHeight = screenHeight * 0.85;
 
-    if (screenWidth < minScreenWidth) {
-      return Center(
-        child: Container(
-          padding: const EdgeInsets.all(24.0),
-          margin: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.black87,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Text(
-            '⚠️ Screen is too narrow for voting.\nPlease expand your window or use a larger device.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          ),
-        ),
-      );
-    }
+    const double aspectRatio = 2 / 3;
 
-    if (screenHeight < minScreenHeight) {
-      return Center(
-        child: Container(
-          padding: const EdgeInsets.all(24.0),
-          margin: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.black87,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Text(
-            '⚠️ Screen is too small for voting.\nPlease expand your window or use a larger device.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          ),
-        ),
-      );
-    }
+    final maxHeight = screenHeight;
+    final maxWidth = maxHeight * aspectRatio;
+
+    final containerWidth = maxWidth > screenWidth ? screenWidth : maxWidth;
+
+    final dragWidth = (screenWidth - (containerWidth * 0.65)) / 2;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -99,8 +69,8 @@ class _VotingState extends State<Voting> {
               duration: const Duration(milliseconds: 200),
               opacity: isHoveringYes ? 1.0 : 0.0,
               child: Container(
-                width: boxSizeW,
-                height: boxSizeH,
+                width: dragWidth,
+                height: boxHeight,
                 decoration: BoxDecoration(
                   color: const Color(0xff2036e1),
                   borderRadius: BorderRadius.circular(24),
@@ -138,8 +108,8 @@ class _VotingState extends State<Voting> {
               duration: const Duration(milliseconds: 200),
               opacity: isHoveringNo ? 1.0 : 0.0,
               child: Container(
-                width: boxSizeW,
-                height: boxSizeH,
+                width: dragWidth,
+                height: boxHeight,
                 decoration: BoxDecoration(
                   color: const Color(0xffbf1212), // Red background
                   borderRadius: BorderRadius.circular(24),
