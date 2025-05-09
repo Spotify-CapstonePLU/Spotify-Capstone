@@ -29,11 +29,11 @@ class Poll {
         pollId: json['poll_id'],
         songId: json['song_id'],
         song: Song.fromJson(json['song']),
-        type: json['type'],
+        type: json['poll_type'],
         upvotes: json['upvotes'],
         downvotes: json['downvotes'],
-        startTime: json['start_time'],
-        endTime: json['end_time'],);
+        startTime: DateTime.parse(json['start_time']),
+        endTime: DateTime.parse(json['end_time']),);
   }
 
   @override
