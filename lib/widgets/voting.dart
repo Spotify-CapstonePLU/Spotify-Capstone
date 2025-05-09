@@ -22,7 +22,7 @@ class _VotingState extends State<Voting> {
         .map((poll) {
           return SongCardData(
             songName: poll.song.title,
-            artistName: poll.song.artist,
+            artistNames: poll.song.artists.toString().substring(1, poll.song.artists.toString().length-1),
             trackArt: poll.song.imageUrl,
             votes: [poll.upvotes.toDouble(), poll.downvotes.toDouble()],
           );
@@ -37,7 +37,7 @@ class _VotingState extends State<Voting> {
           0,
           SongCardData(
             songName: "Song ${_songCards.length + 1}",
-            artistName: "Artist ${_songCards.length + 1}",
+            artistNames: "Artist ${_songCards.length + 1}",
             trackArt: "assets/trackArtPlaceholder.png",
             votes: [0, 0], // Placeholder art
           ));

@@ -36,7 +36,7 @@ class _SearchItemsState extends State<SearchItems> {
   MediaItemData songToMedia(Song song) {
     return MediaItemData(
       title: song.title,
-      details: '${song.details} by ${song.artist}',
+      details: '${song.details} by ${song.artists.toString().substring(1, song.artists.toString().length - 1)}',
       imageUrl: song.imageUrl,
       onTap: () {
         void handleCreatePoll() async {
