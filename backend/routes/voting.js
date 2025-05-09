@@ -115,6 +115,7 @@ router.get('/search', AuthenticateApp, async (req, res) => {
 
 router.post("/polls/create", VerifyTokens, async (req, res) => {
   const { playlist_id: playlistId, song_id: songId } = req.body;
+  const spotifyClient = new SpotifyClient(req.cookies.access_token);
 
   try {
     // Determine if a poll can be created
@@ -156,6 +157,15 @@ router.post("/polls/create", VerifyTokens, async (req, res) => {
          WHERE playlist_id = $1, song_id = $2`,
       [playlistId, songId]
     );
+
+    const songInfo = (await spotifyClient.getSongsById([songId]))[0];
+
+    const makeSong = await pool.query(
+      `INSERT INTO Songs (song_id, title, album, artists)
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT DO NOTHING`,
+      [songInfo.song_id, songInfo.name, songInfo.album, JSON.stringify(songInfo.artists)]
+    )
 
     const result = await pool.query(
       `INSERT INTO polls (poll_type, playlist_id, song_id)
