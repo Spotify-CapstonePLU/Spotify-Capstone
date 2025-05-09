@@ -154,7 +154,7 @@ router.post("/polls/create", VerifyTokens, async (req, res) => {
 
     const deletePoll = await pool.query(
       `DELETE FROM polls
-         WHERE playlist_id = $1, song_id = $2`,
+         WHERE playlist_id = $1 AND song_id = $2`,
       [playlistId, songId]
     );
 
