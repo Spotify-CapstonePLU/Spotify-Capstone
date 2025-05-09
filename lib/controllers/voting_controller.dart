@@ -54,11 +54,9 @@ class VotingController with ChangeNotifier {
       requestHeaders: {'Content-Type': 'application/json'},
       withCredentials: true,
     );
-
     if (request.status! < 400 && request.status! >= 100) {
       final List<dynamic> data = jsonDecode(request.responseText!);
       final polls = data.map((item) => Poll.fromJson(item)).toList();
-      print(polls.toString());
       return polls;
     } else {
       print('Failed with status: ${request.status}');
