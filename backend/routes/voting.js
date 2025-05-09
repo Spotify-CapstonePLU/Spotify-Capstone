@@ -91,7 +91,16 @@ router.get('/search', AuthenticateApp, async (req, res) => {
   const spotifyClient = new SpotifyClient(app_token);
   console.log(app_token)
   try {
-    res.json(await spotifyClient.searchSongs(song));
+    const songs = await spotifyClient.searchSongs(song);
+    const result = songs.tracks.items.map((track) => ({
+        song_id: track.id,
+        title: track.name,
+        album: track.album.name,
+        artists: track.artists.map(artist => artist.name),
+        imageUrl: track.album.images?.[0]?.url
+      
+    }))
+    res.json(result);
   } catch (error) {
     console.error(error);
     // console.error('Error searching songs:', error.response?.data || error.message);
