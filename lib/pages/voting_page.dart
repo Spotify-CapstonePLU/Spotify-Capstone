@@ -26,7 +26,7 @@ class _VotingPageState extends State<VotingPage> {
   List<MediaItemData> get mediaItems => _songCards.map((song) =>
       MediaItemData(
         title: song.songName,
-        details: song.artistName,
+        details: song.artistNames,
         imageUrl: song.imageUrl,
       )
   ).toList();
@@ -39,7 +39,7 @@ class _VotingPageState extends State<VotingPage> {
           mediaItems: _songCards.map((songCardData) {
             return MediaItemData(
               title: songCardData.songName,
-              details: songCardData.artistName,
+              details: songCardData.artistNames,
               imageUrl: songCardData.trackArt,
               onTap: () {
                 setState(() {
