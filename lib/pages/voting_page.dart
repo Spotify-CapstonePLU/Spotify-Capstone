@@ -106,7 +106,7 @@ class _VotingPageState extends State<VotingPage> {
                       } else {
                         return Padding(
                           padding: const EdgeInsets.all(12),
-                          child: Voting(polls: polls),
+                          child: Expanded(child: Voting(polls: polls)),
                         );
                       }
                     } else {
@@ -116,7 +116,6 @@ class _VotingPageState extends State<VotingPage> {
                     }
                   }
               ),
-
               ElevatedButton(
                 onPressed: _sortSongs,
                 child: const Text("Sort Songs"),

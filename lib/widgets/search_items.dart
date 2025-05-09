@@ -94,7 +94,7 @@ class _SearchItemsState extends State<SearchItems> {
                 controller: searchController,
                 decoration: InputDecoration(
                   hintText: "Search for a song...",
-                  prefixIcon: const Icon(Icons.search),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white,),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
