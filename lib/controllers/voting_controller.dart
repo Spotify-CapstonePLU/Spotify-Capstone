@@ -1,42 +1,89 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:html';
+import 'package:universal_html/html.dart';
 
+import 'package:flutter/cupertino.dart';
 import 'package:spotify_polls/models/song.dart';
+import 'package:spotify_polls/services/websocket_service.dart';
 
-class VotingController {
+import '../models/poll.dart';
+
+class VotingController with ChangeNotifier {
   static const String baseUrl = 'http://127.0.0.1:3000';
+  static const String wsUrl = 'ws://127.0.0.1:3000';
+  final WebSocketService _pollWsService = WebSocketService();
+  final WebSocketService _votingWsService = WebSocketService();
+  final StreamController<String> _pollMessagesController =
+      StreamController<String>.broadcast();
 
-  Future<bool> createPoll(String songId, String playlistId) async {
-    final response = await HttpRequest.request(
-      '$baseUrl/voting/polls/create',
-      method: 'POST',
+  Stream<String> get messages => _pollMessagesController.stream;
+
+  void connectSockets() {
+    _pollWsService.connect("$wsUrl/voting/polls");
+    _votingWsService.connect("$wsUrl/voting");
+
+    _pollWsService.stream.listen((data) {
+      final decoded = jsonDecode(data);
+      print(decoded);
+      // if (decoded['type'] == 'poll_data') {
+      //   _pollMessagesController.add(decoded['message']);
+      // }
+    });
+  }
+
+  void disconnectSockets() {
+    _pollWsService.disconnect();
+    _votingWsService.disconnect();
+  }
+
+  // should be websocket
+  void castVote(String vote, String pollId) async {
+    final message = {
+      "type": vote,
+      "pollId": pollId,
+      "id": DateTime.now().millisecondsSinceEpoch.toString() // simple unique ID
+    };
+
+    _votingWsService.send(jsonEncode(message));
+  }
+
+  Future<List<Poll>> getPolls(String playlistId) async {
+    final request = await HttpRequest.request(
+      '$baseUrl/voting/polls/$playlistId',
+      method: 'GET',
       requestHeaders: {'Content-Type': 'application/json'},
       withCredentials: true,
-      sendData: jsonEncode({
-        'song_id': songId,
-        'playlist_id': playlistId,
-      }),
     );
-
-    if (response.status == 201) {
-      return true;
+    if (request.status! < 400 && request.status! >= 100) {
+      final List<dynamic> data = jsonDecode(request.responseText!);
+      final polls = data.map((item) => Poll.fromJson(item)).toList();
+      return polls;
     } else {
-      return false;
+      print('Failed with status: ${request.status}');
+      return [];
     }
   }
 
-  Future<bool> castVote(String vote) async {
-    final response = await HttpRequest.request('$baseUrl/voting',
-    method: 'POST',
-    requestHeaders: {'Content-Type': 'application/json'},
-    withCredentials: true,
-    sendData: jsonEncode({
-      'vote': vote,
-    }));
+  Future<bool> createPoll(String songId, String playlistId) async {
+    try {
+      final HttpRequest response = await HttpRequest.request(
+        '$baseUrl/voting/polls/create',
+        method: 'POST',
+        requestHeaders: {'Content-Type': 'application/json'},
+        withCredentials: true,
+        sendData: jsonEncode({
+          'song_id': songId,
+          'playlist_id': playlistId,
+        }),
+      );
 
-    if (response.status == 200) {
-      return true;
-    } else {
+
+      return response.status == 200;
+    } catch (error, stackTrace) {
+      print("Something went wrong while creating poll:");
+      print("Error: $error");
+      print("Stack trace: $stackTrace");
+
       return false;
     }
   }
@@ -45,12 +92,10 @@ class VotingController {
     final uri = Uri.parse('$baseUrl/voting/search')
         .replace(queryParameters: {'song': query});
 
-    final response = await HttpRequest.request(
-        uri.toString(),
+    final response = await HttpRequest.request(uri.toString(),
         method: 'GET',
         requestHeaders: {'Content-Type': 'application/json'},
-        withCredentials: true
-    );
+        withCredentials: true);
 
     if (response.status == 200) {
       return Song.parseSongFromSearchResults(response.responseText!);

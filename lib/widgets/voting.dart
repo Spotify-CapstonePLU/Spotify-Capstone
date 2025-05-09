@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_polls/widgets/song_cards.dart';
 
-class Voting extends StatefulWidget {
-  const Voting({super.key, required this.initSongCards});
+import '../models/poll.dart';
 
-  final List<SongCardData> initSongCards;
+class Voting extends StatefulWidget {
+  const Voting({super.key, required this.polls});
+  final List<Poll> polls;
 
   @override
   State<StatefulWidget> createState() => _VotingState();
@@ -16,12 +17,21 @@ class _VotingState extends State<Voting> {
   bool isHoveringYes = false;
   bool isHoveringNo = false;
 
-
   @override
   @override
   void initState() {
     super.initState();
-    _songCards = List.from(widget.initSongCards);
+    _songCards = widget.polls
+        .map((poll) {
+          return SongCardData(
+            songName: poll.song.title,
+            artistNames: poll.song.artists.toString().substring(1, poll.song.artists.toString().length-1),
+            trackArt: poll.song.imageUrl,
+            votes: [poll.upvotes.toDouble(), poll.downvotes.toDouble()],
+          );
+        })
+        .whereType<SongCardData>()
+        .toList();
   }
 
   void _addSong() {
@@ -30,7 +40,7 @@ class _VotingState extends State<Voting> {
           0,
           SongCardData(
             songName: "Song ${_songCards.length + 1}",
-            artistName: "Artist ${_songCards.length + 1}",
+            artistNames: "Artist ${_songCards.length + 1}",
             trackArt: "assets/trackArtPlaceholder.png",
             votes: [0, 0], // Placeholder art
           ));

@@ -26,7 +26,7 @@ router.get('/', VerifyTokens, async (req, res) => {
     const spotifyClient = new SpotifyClient(req.cookies.access_token);
     try { // Retrieve user's id
         const userData = await spotifyClient.getUserData();
-        const userId = userData.id;
+        userId = userData.id;
         // console.log("/ route, userId:" + userId);
 
         if (!userId) {
@@ -59,8 +59,6 @@ router.get('/', VerifyTokens, async (req, res) => {
         return res.status(500).send('Server error getting votelists.');
     }
 });
-
-
 
 // Create a new Spotify playlist
 router.post('/create', VerifyTokens, async (req, res) => {
@@ -276,7 +274,19 @@ router.get('/playlists', VerifyTokens, async (req, res) => {
     const access_token = req.cookies.access_token;
     const spotifyClient = new SpotifyClient(access_token);
     try {
-        res.json(await spotifyClient.getUserPlaylists())
+        const playlistData = await spotifyClient.getUserPlaylists();
+        // const nextUrl = playlistData.next
+        const playlistsJson = playlistData.items.map((playlist) => {
+            const imageUrl = playlist.images?.[0]?.url ?? null;
+
+            return {
+                id: playlist.id, 
+                name: playlist.name, 
+                imageUrl
+            };
+        })
+        console.log("playlistsJson:", playlistsJson)
+        res.json(await playlistsJson)
     } catch (error) {
         console.error(error);
         return res.status(500).send("Error requesting user's playlists from Spotify.");
