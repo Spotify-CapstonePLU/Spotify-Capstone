@@ -5,8 +5,10 @@ class RingChart extends StatelessWidget {
   RingChart({
     super.key,
     required this.votes,
+    required this.size,
   });
 
+  final double size;
   final List<double> votes;
   final List<Color> colors = [
     Colors.green,
@@ -18,10 +20,12 @@ class RingChart extends StatelessWidget {
     return Center(
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         CustomPaint(
-          size: const Size(70, 70),
+          size: Size(size, size),
           painter: RingChartPainter(votes, colors),
         ),
-        Text("votes: ${votes.reduce((a, b) => a + b)} "),
+        Text(
+            "votes: ${votes.reduce((a, b) => a + b)} ",
+            style: TextStyle(fontSize: size * 0.3),),
       ]),
     );
   }
@@ -42,9 +46,9 @@ class RingChartPainter extends CustomPainter {
       final paint = Paint()
         ..color = Colors.grey
         ..style = PaintingStyle.stroke
-        ..strokeWidth = (size.width * size.width) * 0.002;
-      final center = Offset(size.width / 2, size.height / 2);
-      final radius = min(size.width / 2, size.height / 2) - 20;
+        ..strokeWidth = size.width * 0.1;
+      final center = Offset(size.width / 2, size.height/2);
+      final radius = min(size.width / 2, size.height / 2) * 0.7;
 
       // Draw a placeholder empty circle
       canvas.drawCircle(center, radius, paint);

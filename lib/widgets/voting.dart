@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spotify_polls/widgets/song_cards.dart';
 
 class Voting extends StatefulWidget {
-  const Voting({super.key,
-  required this.initSongCards});
+  const Voting({super.key, required this.initSongCards});
 
   final List<SongCardData> initSongCards;
 
@@ -14,7 +13,12 @@ class Voting extends StatefulWidget {
 class _VotingState extends State<Voting> {
   late List<SongCardData> _songCards;
 
-  @override @override
+  bool isHoveringYes = false;
+  bool isHoveringNo = false;
+
+
+  @override
+  @override
   void initState() {
     super.initState();
     _songCards = List.from(widget.initSongCards);
@@ -28,7 +32,7 @@ class _VotingState extends State<Voting> {
             songName: "Song ${_songCards.length + 1}",
             artistName: "Artist ${_songCards.length + 1}",
             trackArt: "assets/trackArtPlaceholder.png",
-            votes: [0, 0],// Placeholder art
+            votes: [0, 0], // Placeholder art
           ));
     });
   }
@@ -36,64 +40,102 @@ class _VotingState extends State<Voting> {
   void voteYes() {
     _songCards[_songCards.length - 1].votes[0] += 1;
   }
+
   void voteNo() {
     _songCards[_songCards.length - 1].votes[1] += 1;
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final boxHeight = screenHeight * 0.85;
+
+    const double aspectRatio = 2 / 3;
+
+    final maxHeight = screenHeight;
+    final maxWidth = maxHeight * aspectRatio;
+
+    final containerWidth = maxWidth > screenWidth ? screenWidth : maxWidth;
+
+    final dragWidth = (screenWidth - (containerWidth * 0.65)) / 2;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         DragTarget<int>(
           builder: (context, candidateData, rejectedData) {
-            return Container(
-              width: 200,
-              height: 200,
-              color: candidateData.isNotEmpty ? Colors.green : Colors.red,
-              child: Center(
-                child: Text(
-                  candidateData.isNotEmpty
-                      ? 'Hovering: ${candidateData.first}' // Access the first item in the list
-                      : 'Drag an item here!',
-                  style: const TextStyle(color: Colors.white),
+            return AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              opacity: isHoveringYes ? 1.0 : 0.0,
+              child: Container(
+                width: dragWidth,
+                height: boxHeight,
+                decoration: BoxDecoration(
+                  color: const Color(0xff2036e1),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: const Center(
+                  child: Icon(Icons.check, color: Colors.white, size: 150),
                 ),
               ),
             );
           },
           onWillAcceptWithDetails: (data) {
             // print('Will accept: $data');
+            setState(() {
+              isHoveringYes = true;
+            });
             return true; // Indicate whether to accept the draggable item
           },
           onAcceptWithDetails: (data) {
+            setState(() {
+              isHoveringYes = false;
+            });
             voteYes();
             // print('Accepted: $data');
+          },
+          onLeave: (data) {
+            setState(() {
+              isHoveringYes = false;
+            });
           },
         ),
         SongCardList(songCards: _songCards, onAdd: _addSong),
         DragTarget<int>(
           builder: (context, candidateData, rejectedData) {
-            return Container(
-              width: 200,
-              height: 200,
-              color: candidateData.isNotEmpty ? Colors.green : Colors.red,
-              child: Center(
-                child: Text(
-                  candidateData.isNotEmpty
-                      ? 'Hovering: ${candidateData.first}' // Access the first item in the list
-                      : 'Drag an item here!',
-                  style: const TextStyle(color: Colors.white),
+            return AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              opacity: isHoveringNo ? 1.0 : 0.0,
+              child: Container(
+                width: dragWidth,
+                height: boxHeight,
+                decoration: BoxDecoration(
+                  color: const Color(0xffbf1212), // Red background
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: const Center(
+                  child: Icon(Icons.close, color: Colors.white, size: 150),
                 ),
               ),
             );
           },
           onWillAcceptWithDetails: (data) {
-            // print('Will accept: $data');
-            return true; // Indicate whether to accept the draggable item
+            setState(() {
+              isHoveringNo = true;
+            });
+            return true;
           },
           onAcceptWithDetails: (data) {
+            setState(() {
+              isHoveringNo = false;
+            });
             voteNo();
-            // print('Accepted: $data');
+          },
+          onLeave: (data) {
+            setState(() {
+              isHoveringNo = false;
+            });
           },
         ),
       ],

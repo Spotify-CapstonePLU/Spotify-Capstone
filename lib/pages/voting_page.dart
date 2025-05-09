@@ -89,7 +89,7 @@ class _VotingPageState extends State<VotingPage> {
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Voting(key: _votingWidgetKey, initSongCards: _songCards),
+              Expanded(child: Voting(key: _votingWidgetKey, initSongCards: _songCards),),
               ElevatedButton(
                 onPressed: _sortSongs,
                 child: const Text("Sort Songs"),
