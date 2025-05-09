@@ -137,7 +137,10 @@ class _SongCardState extends State<SongCard> {
                     0.01), // Adjust the padding value as needed
                 child: Stack(
                   children: [
-                    Image.network(widget.cardData.trackArt),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(widget.cardData.trackArt),
+                    ),
                     Positioned(
                       top: 0, // Align to the top
                       right: 0, // Align to the right
@@ -146,7 +149,7 @@ class _SongCardState extends State<SongCard> {
                           maxWidth: containerWidth * 0.16,
                           maxHeight: containerWidth * 0.2,
                         ),
-                        child: RingChart(votes: widget.cardData.votes),
+                        child: RingChart(votes: widget.cardData.votes, size: containerWidth * 0.1,),
                       ),
                     ),
                   ],
