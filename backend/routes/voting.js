@@ -152,20 +152,19 @@ router.post("/polls/create", VerifyTokens, async (req, res) => {
     );
     const pollType = song.rows[0].exists_in_votelist ? "remove" : "add";
 
-    const deletePoll = await pool.query(
-      `DELETE FROM polls
-         WHERE playlist_id = $1 AND song_id = $2`,
-      [playlistId, songId]
-    );
-
     const songInfo = (await spotifyClient.getSongsById([songId]))[0];
-
     const makeSong = await pool.query(
       `INSERT INTO Songs (song_id, title, album, artists)
             VALUES ($1, $2, $3, $4)
             ON CONFLICT DO NOTHING`,
       [songInfo.song_id, songInfo.name, songInfo.album, JSON.stringify(songInfo.artists)]
     )
+
+    const deletePoll = await pool.query(
+      `DELETE FROM polls
+         WHERE playlist_id = $1 AND song_id = $2`,
+      [playlistId, songId]
+    );
 
     const result = await pool.query(
       `INSERT INTO polls (poll_type, playlist_id, song_id)
