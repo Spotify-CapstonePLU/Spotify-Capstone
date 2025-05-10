@@ -31,6 +31,9 @@ router.get('/polls/:playlist_id', VerifyTokens, async (req, res) => {
       [playlist_id]
     );
     const songIds = result.rows.map((track) => track.song_id);
+    if (songIds.length == 0) {
+      return res.json([])
+    }
     const images = (await spotifyClient.getSongsById(songIds)).map((track) => track.imageUrl);
     const realResult = result.rows.map((row, index) => ({
       ...row,
@@ -39,6 +42,7 @@ router.get('/polls/:playlist_id', VerifyTokens, async (req, res) => {
         imageUrl: images[index]
       }
     }));
+    console.log("help4")
     res.json(realResult);
   } catch (error) {
     console.error(error);
