@@ -38,7 +38,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
           0,
           SongCardData(
             songName: "Song ${_songCards.length + 1}",
-            artistName: "Artist ${_songCards.length + 1}",
+            artistNames: "Artist ${_songCards.length + 1}",
             trackArt: "assets/trackArtPlaceholder.png",
             votes: [0, 0], // Placeholder art
           ));
@@ -65,7 +65,7 @@ class _LiveRoomPageState extends State<LiveRoomPage> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Voting(initSongCards: _songCards),
+                // Voting(initSongCards: _songCards),
                 const SizedBox(height: 20),
                 const SizedBox(height: 20),
                 ControlBar(size: shortestSide)
