@@ -28,7 +28,7 @@ app.use("/auth", authRoutes);
 app.use("/votelists", votelistRoutes);
 app.use("/voting", votingRoutes);
 
-app.ws("/voting", votingWsRoutes);
+app.use("/voting", votingWsRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://127.0.0.1:${PORT}`);
