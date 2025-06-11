@@ -14,7 +14,6 @@ class Voting extends StatefulWidget {
 }
 
 class _VotingState extends State<Voting> {
-  late List<SongCardData> _songCards;
 
   bool isHoveringYes = false;
   bool isHoveringNo = false;
@@ -23,17 +22,6 @@ class _VotingState extends State<Voting> {
   @override
   void initState() {
     super.initState();
-    _songCards = widget.polls
-        .map((poll) {
-          return SongCardData(
-            songName: poll.song.title,
-            artistNames: poll.song.artists.toString().substring(1, poll.song.artists.toString().length-1),
-            trackArt: poll.song.imageUrl,
-            votes: [poll.upvotes.toDouble(), poll.downvotes.toDouble()],
-          );
-        })
-        .whereType<SongCardData>()
-        .toList();
   }
 
   void voteYes(String pollId) {
@@ -99,6 +87,11 @@ class _VotingState extends State<Voting> {
               isHoveringYes = false;
             });
           },
+        ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: SongCardList(pollData: widget.polls)
         ),
         SongCardList(songCards: _songCards, onAdd: _addSong),
         DragTarget<int>(
