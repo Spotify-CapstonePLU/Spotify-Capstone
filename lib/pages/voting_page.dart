@@ -90,7 +90,7 @@ class _VotingPageState extends State<VotingPage> {
                       } else {
                         return Padding(
                           padding: const EdgeInsets.all(12),
-                          child: Expanded(child: Voting(polls: polls)),
+                          child: Voting(polls: polls, votingController: votingController,),
                         );
                       }
                     } else {
