@@ -9,7 +9,7 @@ class RingChart extends StatelessWidget {
   });
 
   final double size;
-  final List<double> votes;
+  final List<int> votes;
   final List<Color> colors = [
     Colors.green,
     Colors.red,
@@ -32,14 +32,14 @@ class RingChart extends StatelessWidget {
 }
 
 class RingChartPainter extends CustomPainter {
-  final List<double> values;
+  final List<int> values;
   final List<Color> colors;
 
   RingChartPainter(this.values, this.colors);
 
   @override
   void paint(Canvas canvas, Size size) {
-    double total = values.reduce((a, b) => a + b);
+    int total = values.reduce((a, b) => a + b);
 
     if (total == 0) {
       // Draw an empty ring or placeholder message
