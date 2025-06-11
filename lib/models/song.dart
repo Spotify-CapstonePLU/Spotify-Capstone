@@ -14,9 +14,11 @@ class Song extends MediaItemData {
       required this.songId});
 
   factory Song.fromJson(Map<String, dynamic> json) {
-    final artistNames = (json['artists'] as List).isNotEmpty
-        ? (json['artists'] as List).cast<String>()
-        : ['Unknown Artist'];
+    final artistNames = (json['artists'] as List<dynamic>).map((artist) {
+      if (artist is String) return artist;
+      if (artist is Map<String, dynamic>) return artist['name'] as String? ?? 'Unknown Artist';
+      return 'Unknown Artist';
+    }).toList();
 
     final imageUrl = (json['imageUrl'] as String) ?? 'lib/assets/trackPlaceHolder.png';
 
