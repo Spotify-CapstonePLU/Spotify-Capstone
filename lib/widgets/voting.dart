@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:spotify_polls/controllers/voting_controller.dart';
 import 'package:spotify_polls/widgets/song_cards.dart';
 
 import '../models/poll.dart';
 
 class Voting extends StatefulWidget {
-  const Voting({super.key, required this.polls});
+  const Voting({super.key, required this.polls, required this.votingController});
+  final VotingController votingController;
   final List<Poll> polls;
 
   @override
@@ -34,25 +36,12 @@ class _VotingState extends State<Voting> {
         .toList();
   }
 
-  void _addSong() {
-    setState(() {
-      _songCards.insert(
-          0,
-          SongCardData(
-            songName: "Song ${_songCards.length + 1}",
-            artistNames: "Artist ${_songCards.length + 1}",
-            trackArt: "assets/trackArtPlaceholder.png",
-            votes: [0, 0], // Placeholder art
-          ));
-    });
+  void voteYes(String pollId) {
+    widget.votingController.castVote("yes", pollId);
   }
 
-  void voteYes() {
-    _songCards[_songCards.length - 1].votes[0] += 1;
-  }
-
-  void voteNo() {
-    _songCards[_songCards.length - 1].votes[1] += 1;
+  void voteNo(String pollId) {
+    widget.votingController.castVote("no", pollId);
   }
 
   @override
