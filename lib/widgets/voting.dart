@@ -34,29 +34,20 @@ class _VotingState extends State<Voting> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final boxHeight = screenHeight * 0.85;
-
-    const double aspectRatio = 2 / 3;
-
-    final maxHeight = screenHeight;
-    final maxWidth = maxHeight * aspectRatio;
-
-    final containerWidth = maxWidth > screenWidth ? screenWidth : maxWidth;
-
-    final dragWidth = (screenWidth - (containerWidth * 0.65)) / 2;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        DragTarget<int>(
+        Expanded(
+          flex: 3,
+          child: DragTarget<int>(
           builder: (context, candidateData, rejectedData) {
             return AnimatedOpacity(
               duration: const Duration(milliseconds: 200),
               opacity: isHoveringYes ? 1.0 : 0.0,
               child: Container(
-                width: dragWidth,
                 height: boxHeight,
                 decoration: BoxDecoration(
                   color: const Color(0xff2036e1),
@@ -79,8 +70,8 @@ class _VotingState extends State<Voting> {
             setState(() {
               isHoveringYes = false;
             });
-            voteYes();
-            // print('Accepted: $data');
+            // voteYes();
+            print('Accepted: $data');
           },
           onLeave: (data) {
             setState(() {
@@ -93,42 +84,44 @@ class _VotingState extends State<Voting> {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: SongCardList(pollData: widget.polls)
         ),
-        SongCardList(songCards: _songCards, onAdd: _addSong),
-        DragTarget<int>(
-          builder: (context, candidateData, rejectedData) {
-            return AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
-              opacity: isHoveringNo ? 1.0 : 0.0,
-              child: Container(
-                width: dragWidth,
-                height: boxHeight,
-                decoration: BoxDecoration(
-                  color: const Color(0xffbf1212), // Red background
-                  borderRadius: BorderRadius.circular(24),
+        Expanded(
+          flex: 3,
+          child: DragTarget<int>(
+            builder: (context, candidateData, rejectedData) {
+              return AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: isHoveringNo ? 1.0 : 0.0,
+                child: Container(
+                  height: boxHeight,
+                  decoration: BoxDecoration(
+                    color: const Color(0xffbf1212), // Red background
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: const Center(
+                    child: Icon(Icons.close, color: Colors.white, size: 150),
+                  ),
                 ),
-                child: const Center(
-                  child: Icon(Icons.close, color: Colors.white, size: 150),
-                ),
-              ),
-            );
-          },
-          onWillAcceptWithDetails: (data) {
-            setState(() {
-              isHoveringNo = true;
-            });
-            return true;
-          },
-          onAcceptWithDetails: (data) {
-            setState(() {
-              isHoveringNo = false;
-            });
-            voteNo();
-          },
-          onLeave: (data) {
-            setState(() {
-              isHoveringNo = false;
-            });
-          },
+              );
+            },
+            onWillAcceptWithDetails: (data) {
+              setState(() {
+                isHoveringNo = true;
+              });
+              return true;
+            },
+            onAcceptWithDetails: (data) {
+              setState(() {
+                isHoveringNo = false;
+              });
+              // voteNo();
+              print('Accepted: $data');
+            },
+            onLeave: (data) {
+              setState(() {
+                isHoveringNo = false;
+              });
+            },
+          )
         ),
       ],
     );
