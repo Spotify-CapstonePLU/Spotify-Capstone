@@ -100,12 +100,24 @@ class _VotingPageState extends State<VotingPage> {
                     }
                   }
               ),
-              ElevatedButton(
-                onPressed: _sortSongs,
-                child: const Text("Sort Songs"),
-              ),
             ],
           ),
+          Align(
+            alignment: Alignment.center,
+            child: Padding(
+                padding: EdgeInsets.fromLTRB(0, MediaQuery.sizeOf(context).height * 0.7, 0, 0) ,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: _sortSongs,
+                      child: const Text("Sort Songs"),
+                    )
+                  ],
+                )
+            ),
+          )
+
         ],
       ),
       floatingActionButton: FloatingActionButton(
