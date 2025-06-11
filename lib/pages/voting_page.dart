@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_polls/controllers/voting_controller.dart';
+import 'package:spotify_polls/models/song.dart';
 import 'package:spotify_polls/widgets/custom_app_bar.dart';
-import 'package:spotify_polls/widgets/song_cards.dart';
-import 'package:spotify_polls/models/media_item.dart';
 import 'package:spotify_polls/widgets/search_items.dart';
 import 'package:spotify_polls/widgets/voting.dart';
 
 import '../models/poll.dart';
-import '../widgets/song_drawer.dart';
 import '../widgets/sort_songs.dart';
 
 class VotingPage extends StatefulWidget {
@@ -20,36 +18,22 @@ class VotingPage extends StatefulWidget {
 }
 
 class _VotingPageState extends State<VotingPage> {
-  final List<SongCardData> _songCards = [];
+  final List<Poll> polls = [];
   late Future<List<Poll>> _pollsFuture;
 
-  List<MediaItemData> get mediaItems => _songCards.map((song) =>
-      MediaItemData(
-        title: song.songName,
-        details: song.artistNames,
-        imageUrl: song.imageUrl,
-      )
+  List<Song> get songs => polls.map((poll) =>
+      poll.song
   ).toList();
+
+  final VotingController votingController = VotingController();
+  final TextEditingController _controller = TextEditingController();
 
   void _sortSongs() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return SortSongs(
-          mediaItems: _songCards.map((songCardData) {
-            return MediaItemData(
-              title: songCardData.songName,
-              details: songCardData.artistNames,
-              imageUrl: songCardData.trackArt,
-              onTap: () {
-                setState(() {
-                  _songCards.remove(songCardData);
-                  _songCards.add(songCardData);
-                });
-                Navigator.pop(context);
-              },
-            );
-          }).toList(),
+          songs: songs
         );
       },
     );
@@ -69,15 +53,15 @@ class _VotingPageState extends State<VotingPage> {
   @override
   void initState() {
     super.initState();
-    _pollsFuture = VotingController().getPolls(widget.playlistId);
-    VotingController().connectSockets();
+    votingController.connectSockets();
+    _pollsFuture = votingController.getPolls(widget.playlistId);
     // connect to websocket for getting polls
     // connect to websocket for voting
   }
 
   @override
   void dispose() {
-    VotingController().disconnectSockets();
+    votingController.disconnectSockets();
     super.dispose();
   }
 
