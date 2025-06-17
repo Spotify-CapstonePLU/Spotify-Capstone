@@ -24,12 +24,11 @@ class _VotingState extends State<Voting> {
     super.initState();
   }
 
-  void voteYes(String pollId) {
-    widget.votingController.castVote("yes", pollId);
-  }
-
-  void voteNo(String pollId) {
-    widget.votingController.castVote("no", pollId);
+  void vote(String pollId, bool vote) {
+    if (vote) {
+      return widget.votingController.castVote("YES", pollId);
+    }
+    return widget.votingController.castVote("NO", pollId);
   }
 
   @override
@@ -42,43 +41,42 @@ class _VotingState extends State<Voting> {
       children: [
         Expanded(
           flex: 3,
-          child: DragTarget<int>(
-          builder: (context, candidateData, rejectedData) {
-            return AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
-              opacity: isHoveringYes ? 1.0 : 0.0,
-              child: Container(
-                height: boxHeight,
-                decoration: BoxDecoration(
-                  color: const Color(0xff2036e1),
-                  borderRadius: BorderRadius.circular(24),
+          child: DragTarget<String>(
+            builder: (context, candidateData, rejectedData) {
+              return AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: isHoveringYes ? 1.0 : 0.0,
+                child: Container(
+                  height: boxHeight,
+                  decoration: BoxDecoration(
+                    color: const Color(0xff2036e1),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: const Center(
+                    child: Icon(Icons.check, color: Colors.white, size: 150),
+                  ),
                 ),
-                child: const Center(
-                  child: Icon(Icons.check, color: Colors.white, size: 150),
-                ),
-              ),
-            );
-          },
-          onWillAcceptWithDetails: (data) {
-            // print('Will accept: $data');
-            setState(() {
-              isHoveringYes = true;
-            });
-            return true; // Indicate whether to accept the draggable item
-          },
-          onAcceptWithDetails: (data) {
-            setState(() {
-              isHoveringYes = false;
-            });
-            // voteYes();
-            print('Accepted: $data');
-          },
-          onLeave: (data) {
-            setState(() {
-              isHoveringYes = false;
-            });
-          },
-        ),
+              );
+            },
+            onWillAcceptWithDetails: (data) {
+              // print('Will accept: $data');
+              setState(() {
+                isHoveringYes = true;
+              });
+              return true; // Indicate whether to accept the draggable item
+            },
+            onAcceptWithDetails: (data) {
+              setState(() {
+                isHoveringYes = false;
+              });
+              vote(data.data, true);
+            },
+            onLeave: (data) {
+              setState(() {
+                isHoveringYes = false;
+              });
+            },
+          ),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -86,7 +84,7 @@ class _VotingState extends State<Voting> {
         ),
         Expanded(
           flex: 3,
-          child: DragTarget<int>(
+          child: DragTarget<String>(
             builder: (context, candidateData, rejectedData) {
               return AnimatedOpacity(
                 duration: const Duration(milliseconds: 200),
@@ -113,8 +111,7 @@ class _VotingState extends State<Voting> {
               setState(() {
                 isHoveringNo = false;
               });
-              // voteNo();
-              print('Accepted: $data');
+              vote(data.data, false);
             },
             onLeave: (data) {
               setState(() {
