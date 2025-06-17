@@ -20,15 +20,18 @@ class VotingController with ChangeNotifier {
 
   void connectSockets() {
     _pollWsService.connect("$wsUrl/voting/polls");
-    _votingWsService.connect("$wsUrl/voting");
-
-    _pollWsService.stream.listen((data) {
-      final decoded = jsonDecode(data);
-      print(decoded);
-      // if (decoded['type'] == 'poll_data') {
-      //   _pollMessagesController.add(decoded['message']);
-      // }
+    _votingWsService.connect("$wsUrl/voting/");
+    _votingWsService.subscribe((message) {
+      print(message);
     });
+
+    // _pollWsService.stream.listen((data) {
+    //   final decoded = jsonDecode(data);
+    //   print(decoded);
+    //   // if (decoded['type'] == 'poll_data') {
+    //   //   _pollMessagesController.add(decoded['message']);
+    //   // }
+    // });
   }
 
   void disconnectSockets() {

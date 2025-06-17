@@ -17,6 +17,14 @@ class WebSocketService {
     );
   }
 
+  bool subscribe(void Function(dynamic) onData) {
+    if (_channel != null) {
+      _channel!.stream.listen(onData);
+      return true;
+    }
+    return false;
+  }
+
   void send(String message) {
     _channel?.sink.add(message);
   }
