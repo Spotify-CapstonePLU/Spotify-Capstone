@@ -60,7 +60,7 @@ class _SongCardListState extends State<SongCardList> {
                     child: Builder(builder: (context) {
                       if (i == displayCards.length - 1) {
                         return Draggable(
-                          data: i,
+                          data: displayCards[i].cardData.pollId,
                           feedback: ConstrainedBox(
                             constraints: BoxConstraints.tightFor(
                               width: containerWidth *
