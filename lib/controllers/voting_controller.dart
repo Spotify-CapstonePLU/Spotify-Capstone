@@ -42,7 +42,7 @@ class VotingController with ChangeNotifier {
   // should be websocket
   void castVote(String vote, String pollId) async {
     final message = {
-      "type": vote,
+      "vote": vote,
       "pollId": pollId,
       "id": DateTime.now().millisecondsSinceEpoch.toString() // simple unique ID
     };
