@@ -34,7 +34,8 @@ export default async function voteHandler(pollId, vote, access_token) {
             `INSERT INTO Votes(poll_id, user_id, vote)
              VALUES ($1, $2, $3)
              ON CONFLICT (poll_id, user_id) DO UPDATE
-             SET vote = EXCLUDED.vote`,
+             SET vote = EXCLUDED.vote
+             RETURNING *`,
             [pollId, userId, vote]
         )
         res.json(result.rows[0]);
