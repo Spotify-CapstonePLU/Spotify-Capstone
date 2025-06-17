@@ -13,12 +13,9 @@ class VotingController with ChangeNotifier {
   static const String wsUrl = 'ws://127.0.0.1:3000';
   final WebSocketService _pollWsService = WebSocketService();
   final WebSocketService _votingWsService = WebSocketService();
-  final StreamController<String> _pollMessagesController =
-      StreamController<String>.broadcast();
-
-  Stream<String> get messages => _pollMessagesController.stream;
 
   void connectSockets() {
+    print("testing websocket connection");
     _pollWsService.connect("$wsUrl/voting/polls");
     _votingWsService.connect("$wsUrl/voting/");
     _votingWsService.subscribe((message) {
