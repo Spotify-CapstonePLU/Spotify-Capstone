@@ -36,14 +36,13 @@ class VotingController with ChangeNotifier {
     _votingWsService.disconnect();
   }
 
-  // should be websocket
   void castVote(String vote, String pollId) async {
     final message = {
       "vote": vote,
       "pollId": pollId,
       "id": DateTime.now().millisecondsSinceEpoch.toString() // simple unique ID
     };
-
+    print("voting ws message sent: ${message}");
     _votingWsService.send(jsonEncode(message));
   }
 
