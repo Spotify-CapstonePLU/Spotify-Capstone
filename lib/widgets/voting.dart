@@ -26,9 +26,9 @@ class _VotingState extends State<Voting> {
 
   void vote(String pollId, bool vote) {
     if (vote) {
-      return widget.votingController.castVote("YES", pollId);
+      return widget.votingController.castVote("upvote", pollId);
     }
-    return widget.votingController.castVote("NO", pollId);
+    return widget.votingController.castVote("downvote", pollId);
   }
 
   @override
