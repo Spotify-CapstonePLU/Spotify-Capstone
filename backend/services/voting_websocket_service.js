@@ -19,28 +19,50 @@ export default async function voteHandler(pollId, vote, access_token) {
         userId = userData.id;
         // console.log("/create route, userId:" + userId);
         if (!userId) {
-            return res.status(404).send("User ID not found.");
+            return "User ID not found.";
         }
     } catch (error) {
         console.error(error);
         if (error.response?.status === 401) {
-            return res.status(401).send("Invalid or expired Spotify access token.");
+            return "Invalid or expired Spotify access token.";
         }
-        return res.status(500).send("Failed to retrieve user's id.");
+        return "Failed to retrieve user's id.";
     }
 
     try {
-        const result = await pool.query(
+        const voteResult = await pool.query(
             `INSERT INTO Votes(poll_id, user_id, vote)
-             VALUES ($1, $2, $3)
+             VALUES ($1, $2, $3::vote)
              ON CONFLICT (poll_id, user_id) DO UPDATE
-             SET vote = EXCLUDED.vote
-             RETURNING *`,
+             SET vote = EXCLUDED.vote`,
             [pollId, userId, vote]
         )
-        res.json(result.rows[0]);
+
+        const result = await pool.query(
+            `SELECT 
+                Polls.*, 
+                to_jsonb(Songs) AS song
+             FROM Polls
+             LEFT JOIN Songs ON Songs.song_id = Polls.song_id
+             WHERE poll_id = $1
+            `,
+            [pollId]
+        )
+        const songIds = result.rows.map((track) => track.song_id);
+        if (songIds.length == 0) {
+            return JSON.stringify([]);
+        }
+        const images = (await spotifyClient.getSongsById(songIds)).map((track) => track.imageUrl);
+        const realResult = result.rows.map((row, index) => ({
+            ...row,
+            song: {
+                ...row.song,
+                imageUrl: images[index]
+            }
+        }));
+        return JSON.stringify(realResult);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error updating poll.');
+        return "Error updating poll.";
     }
 }
