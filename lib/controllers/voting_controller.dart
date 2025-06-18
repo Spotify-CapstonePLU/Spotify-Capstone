@@ -14,21 +14,12 @@ class VotingController with ChangeNotifier {
   final WebSocketService _pollWsService = WebSocketService();
   final WebSocketService _votingWsService = WebSocketService();
 
+  Stream<dynamic> get votingStream => _votingWsService.stream;
+
   void connectSockets() {
     print("testing websocket connection");
     _pollWsService.connect("$wsUrl/voting/polls");
     _votingWsService.connect("$wsUrl/voting/");
-    _votingWsService.subscribe((message) {
-      print(message);
-    });
-
-    // _pollWsService.stream.listen((data) {
-    //   final decoded = jsonDecode(data);
-    //   print(decoded);
-    //   // if (decoded['type'] == 'poll_data') {
-    //   //   _pollMessagesController.add(decoded['message']);
-    //   // }
-    // });
   }
 
   void disconnectSockets() {
