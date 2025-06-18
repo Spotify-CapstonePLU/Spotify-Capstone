@@ -65,22 +65,21 @@ router.ws('/', (ws, req) => {
   });
 });
 
-const NOTIFY_CHANNEL = 'polls_channel';
+// const NOTIFY_CHANNEL = 'polls_channel';
 
-pollPool.query(`LISTEN ${NOTIFY_CHANNEL}`);
+// pollPool.query(`LISTEN ${NOTIFY_CHANNEL}`);
 
-// Handle notifications from PostgreSQL
-pollPool.on('notification', (msg) => {
-  const payload = msg.payload;
-  console.log('Received NOTIFY:', payload);
+// // Handle notifications from PostgreSQL
+// pollPool.on('notification', (msg) => {
+//   const payload = msg.payload;
+//   console.log('Received NOTIFY:', payload);
 
-  // Broadcast payload to all connected WebSocket clients
-  for (const client of pollClients) {
-    if (client.readyState === 1) { // WebSocket.OPEN
-      client.send(payload);
-    }
-  }
-});
+//   // Broadcast payload to all connected WebSocket clients
+//   for (const client of pollClients) {
+//     if (client.readyState === 1) { // WebSocket.OPEN
+//       client.send(payload);
+//     }
+//   }
+// });
 
-
-export default routerWs;
+export default router;
