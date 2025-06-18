@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:spotify_polls/controllers/voting_controller.dart';
 import 'package:spotify_polls/models/song.dart';
@@ -20,6 +23,7 @@ class VotingPage extends StatefulWidget {
 class _VotingPageState extends State<VotingPage> {
   List<Poll> polls = [];
   late Future<List<Poll>> _pollsFuture;
+  late StreamSubscription _votingSubscription;
 
   List<Song> get songs => polls.map((poll) =>
       poll.song
@@ -54,13 +58,24 @@ class _VotingPageState extends State<VotingPage> {
     super.initState();
     votingController.connectSockets();
     _pollsFuture = votingController.getPolls(widget.playlistId);
-    // connect to websocket for getting polls
-    // connect to websocket for voting
+    _votingSubscription = votingController.votingStream.listen((msg) {
+      final data = jsonDecode(msg);
+      
+      print("Voting Page received message: " + data.toString() + "::: end message");
+      Poll updatedPoll = Poll.fromJson(data[0]);
+      final index = polls.indexWhere((poll) => poll.pollId == updatedPoll.pollId);
+      if (index != -1) {
+        setState(() {
+          polls[index] = updatedPoll;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     votingController.disconnectSockets();
+    _votingSubscription.cancel();
     super.dispose();
   }
 
