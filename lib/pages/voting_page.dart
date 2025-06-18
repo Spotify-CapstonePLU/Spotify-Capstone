@@ -18,7 +18,7 @@ class VotingPage extends StatefulWidget {
 }
 
 class _VotingPageState extends State<VotingPage> {
-  final List<Poll> polls = [];
+  List<Poll> polls = [];
   late Future<List<Poll>> _pollsFuture;
 
   List<Song> get songs => polls.map((poll) =>
@@ -81,7 +81,7 @@ class _VotingPageState extends State<VotingPage> {
                     } else if (snapshot.hasError) {
                       return Center(child: Text('Error: ${snapshot.error}'));
                     } else if (snapshot.hasData) {
-                      List<Poll> polls = snapshot.data!;
+                      polls = snapshot.data!;
 
                       if (polls.isEmpty) {
                         return const Center(
