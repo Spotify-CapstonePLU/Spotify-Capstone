@@ -20,7 +20,7 @@ class Song extends MediaItemData {
       return 'Unknown Artist';
     }).toList();
 
-    final imageUrl = (json['imageUrl'] as String) ?? 'lib/assets/trackPlaceHolder.png';
+    final imageUrl = json['imageUrl']?.toString() ?? 'lib/assets/trackPlaceHolder.png';
 
     return Song(
         title: json['title'] as String,
