@@ -28,32 +28,68 @@ class _MediaItemListState extends State<MediaItemList> {
     return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.blueAccent),
+          border: Border.all(),
         ),
         child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
             child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemBuilder: (_, index) {
-                      var curData = widget.listData[index];
-                      return Material(
-                        child: ListTile(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)),
-                          tileColor: Colors.amber,
-                          leading: Image.network(curData.imageUrl),
-                          title: Text(curData.title),
-                          subtitle: Text(curData.details),
-                          onTap: curData.onTap,
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemBuilder: (_, index) {
+                  var curData = widget.listData[index];
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child:Material(
+                      child: InkWell(
+                        onTap: curData.onTap,
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.amber,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          padding: const EdgeInsets.all(8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment
+                                .start, // Allows image to be taller
+                            children: [
+                              SizedBox(
+                                width: 75,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.network(
+                                    curData.imageUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Image.network(
+                                          'lib/assets/trackArtPlaceholder.png');
+                                    },
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(curData.title),
+                                    const SizedBox(height: 4),
+                                    Text(curData.details),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      );
-                    },
-                    separatorBuilder: (_, __) => const SizedBox(
-                      height: 10,
-                    ),
-                    itemCount: widget.listData.length,
-                  ),
-                )));
+                      )
+                  ),);
+                },
+                separatorBuilder: (_, __) => const SizedBox(
+                  height: 10,
+                ),
+                itemCount: widget.listData.length,
+              ),
+            )));
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spotify_polls/models/song.dart';
 import 'package:spotify_polls/widgets/song_cards.dart';
 
 import 'package:spotify_polls/models/media_item.dart';
@@ -8,10 +9,10 @@ class SortSongs extends StatefulWidget {
   const SortSongs({
     super.key,
     this.title = "Sort Songs",
-    required this.mediaItems,
+    required this.songs,
   });
   final String title;
-  final List<MediaItemData> mediaItems;
+  final List<Song> songs;
 
   @override
   State<SortSongs> createState() => _SortSongsState();
@@ -31,7 +32,7 @@ class _SortSongsState extends State<SortSongs> {
             const SizedBox(height: 10),
             SizedBox(
               height: 300,
-              child: MediaItemList(listData: widget.mediaItems),
+              child: MediaItemList(listData: widget.songs),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
