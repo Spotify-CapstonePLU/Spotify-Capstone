@@ -2,6 +2,7 @@ import { Router } from 'express';
 import expressWs from 'express-ws';
 import pg from 'pg';
 import cookieParser from 'cookie-parser';
+import voteHandler from '../services/voting_websocket_service.js';
 
 const { Pool } = pg;
 const pollPool = new Pool({
@@ -13,14 +14,15 @@ const pollPool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-const routerWs = Router();
-routerWs.use(cookieParser());
-expressWs(routerWs);
+const router = Router();
+router.use(cookieParser());
+expressWs(router);
 
 const pollClients = new Set();
 const votingClients = new Set();
 
-routerWs.ws('/polls', (ws) => {
+router.ws('/polls', (ws) => {
+  console.log('WebSocket /voting/polls connected');
   pollClients.add(ws)
 
   ws.on('close', () => {
@@ -29,28 +31,32 @@ routerWs.ws('/polls', (ws) => {
   });
 });
 
-
-routerWs.ws('/', (ws, req) => {
+router.ws('/', (ws, req) => {
   console.log('WebSocket /voting connected');
   votingClients.add(ws)
-  ws.on('message', async (msg) => {
-    console.log('Received:', msg);
+  ws.on('open', () => {
+    console.log('WebSocket open event triggered');
+  });
 
+  ws.on('message', async (msg) => {
+    console.log('Received message on /voting:', msg);
     const data = JSON.parse(msg);
 
-    if (data.type === 'vote') {
-      const pollId = data.pollId;
-      // const userId = data.userId;
-      const vote = data.vote;
 
-      // Example: pretend to send to DB/server and get a response
-      let voteResult
-      try {
-        voteResult = await voteHandler(pollId, vote, req.cookies.access_token);
-      } catch (error) {
-        console.error("Server could not handle vote: " + error.message);
-      }
+    const {vote, pollId, id} = data;
+    let voteResult
+    try {
+      voteResult = await voteHandler(pollId, vote, req.cookies.access_token);
+    } catch (error) {
+      console.error("Server could not handle vote: " + error.message);
     }
+
+    console.log("message id: " + id + ", " + voteResult);
+    ws.send(voteResult);
+  });
+
+  ws.on('error', (err) => {
+    console.error('WebSocket error:', err);
   });
 
   ws.on('close', () => {
