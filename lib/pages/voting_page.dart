@@ -26,7 +26,6 @@ class _VotingPageState extends State<VotingPage> {
   ).toList();
 
   final VotingController votingController = VotingController();
-  final TextEditingController _controller = TextEditingController();
 
   void _sortSongs() {
     showDialog(
