@@ -52,7 +52,7 @@ export class SpotifyClient {
     // Get user's playlists
     async getUserPlaylists() {
         try {
-            const response = await this.api.get('/me/playlists');
+            const response = await this.api.get('/me/playlists?limit=50&offset=0');
             return response.data;
         } catch (error) {
             console.error('Error fetching playlists:', error.response?.data || error.message);
@@ -75,11 +75,36 @@ export class SpotifyClient {
     async getUserPlaylistSongs(playlistId) {
         try {
             const response = await this.api.get(`/playlists/${playlistId}`, {
-                params: { fields: 'tracks.items(track(album.name, name, id, artists.name, duration_ms))'}
+                params: { fields: 'tracks.items(track(album.name, name, id, artists.name, duration_ms))' }
             });
             return response.data;
         } catch (error) {
             console.error('Error fetching playlist songs:', error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    async getSongsById(songIds) {
+        try {
+            const response = await this.api.get('/tracks', {
+                params: {
+                    ids: songIds.join(',')
+                }
+            });
+
+            const data = await response.data;
+            console.log(data)
+            const tracks = data.tracks.map((track) => ({
+                song_id: track.id,
+                name: track.name,
+                album: track.album.name,
+                artists: track.artists.map(artist => artist.name),
+                imageUrl: track.album.images?.[0]?.url
+            }))
+
+            return tracks;
+        } catch (error) {
+            console.error('Error fetching songs by id:', error.response?.data || error.message);
             throw error;
         }
     }

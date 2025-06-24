@@ -9,7 +9,7 @@ class RingChart extends StatelessWidget {
   });
 
   final double size;
-  final List<double> votes;
+  final List<int> votes;
   final List<Color> colors = [
     Colors.green,
     Colors.red,
@@ -32,14 +32,14 @@ class RingChart extends StatelessWidget {
 }
 
 class RingChartPainter extends CustomPainter {
-  final List<double> values;
+  final List<int> values;
   final List<Color> colors;
 
   RingChartPainter(this.values, this.colors);
 
   @override
   void paint(Canvas canvas, Size size) {
-    double total = values.reduce((a, b) => a + b);
+    int total = values.reduce((a, b) => a + b);
 
     if (total == 0) {
       // Draw an empty ring or placeholder message
@@ -58,10 +58,10 @@ class RingChartPainter extends CustomPainter {
     double startAngle = -pi / 2;
     final paint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = (size.width * size.width) * 0.002; // Defines ring thickness
+      ..strokeWidth = size.width * 0.1; // Defines ring thickness
 
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = min(size.width / 2, size.height / 2) - 20;
+    final radius = min(size.width / 2, size.height / 2) * 0.7;
 
     for (int i = 0; i < values.length; i++) {
       final sweepAngle = (values[i] / total) * 2 * pi;

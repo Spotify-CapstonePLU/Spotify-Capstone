@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_polls/models/media_item.dart';
+import 'package:spotify_polls/models/poll.dart';
+import 'package:spotify_polls/models/song.dart';
 import 'package:spotify_polls/widgets/ring_chart.dart';
 
 class SongCardList extends StatefulWidget {
   const SongCardList({
     super.key,
-    required this.songCards,
-    required this.onAdd,
+    required this.pollData,
   });
 
-  final List<SongCardData> songCards;
-  final VoidCallback onAdd;
+  final List<Poll> pollData;
 
   @override
   State<StatefulWidget> createState() => _SongCardListState();
@@ -34,8 +34,14 @@ class _SongCardListState extends State<SongCardList> {
 
     final double overlapOffset = containerHeight * 0.05;
 
-    final start = widget.songCards.length > displayListMax ? widget.songCards.length - displayListMax : 0;
-    final displayCards = widget.songCards.skip(start).take(displayListMax).toList();
+    List<Poll> dateSortedPollData = List<Poll>.from(widget.pollData);
+    dateSortedPollData.sort((a,b) => a.endTime.compareTo(b.endTime));
+
+    List<SongCard> songCards = dateSortedPollData.map((p) => SongCard(cardData: p)).toList();
+    songCards = songCards.reversed.toList();
+
+    final start = songCards.length > displayListMax ? songCards.length - displayListMax : 0;
+    final displayCards = songCards.skip(start).take(displayListMax).toList();
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -43,20 +49,18 @@ class _SongCardListState extends State<SongCardList> {
         SizedBox(
           width: containerWidth * 0.6,
           height: containerHeight * 0.6,
-          child:
-          Stack(
+          child: Stack(
             children: [
-              for (int i = displayCards.length - 1; i >= 0; i--)
+              for (int i = 0; i < displayCards.length; i++)
                 Positioned(
                     bottom:
-                        i * overlapOffset - (i * i * containerHeight * 0.005),
+                      (displayCards.length-i) * overlapOffset - ((displayCards.length-i) * (displayCards.length-i) * containerHeight * 0.005),
                     left: 0,
                     right: 0,
                     child: Builder(builder: (context) {
-                      if ((displayCards.length - 1 - i) ==
-                          displayCards.length - 1) {
+                      if (i == displayCards.length - 1) {
                         return Draggable(
-                          data: (displayCards.length - 1) - i,
+                          data: displayCards[i].cardData.pollId,
                           feedback: ConstrainedBox(
                             constraints: BoxConstraints.tightFor(
                               width: containerWidth *
@@ -64,21 +68,26 @@ class _SongCardListState extends State<SongCardList> {
                               height: containerHeight *
                                   0.45, // Set the same height as the child
                             ),
-                            child: SongCard(
-                                cardData:
-                                    displayCards[displayCards.length - 1 - i],
-                                index: i),
+                            child: displayCards[i],
                           ),
                           childWhenDragging: const SizedBox.shrink(),
-                          child: SongCard(
-                              cardData:
-                                  displayCards[displayCards.length - 1 - i],
-                              index: i),
+                          child: displayCards[i],
                         );
                       }
-                      return SongCard(
-                          cardData: displayCards[displayCards.length - 1 - i],
-                          index: i);
+                      return Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.15 * (displayCards.length - i)),
+                            borderRadius:
+                            BorderRadius.circular(11.0),
+                          ),
+                          child: ColorFiltered(
+                            colorFilter: ColorFilter.mode(
+                              Colors.black.withOpacity(0.15 * (displayCards.length - i)), // Tint color for contents
+                              BlendMode.srcATop, // Blend mode for tinting
+                            ),
+                            child: displayCards[i],
+                          ),
+                      );
                     })),
             ],
           ),
@@ -89,10 +98,9 @@ class _SongCardListState extends State<SongCardList> {
 }
 
 class SongCard extends StatefulWidget {
-  const SongCard({super.key, required this.cardData, required this.index});
+  const SongCard({super.key, required this.cardData});
 
-  final int index;
-  final SongCardData cardData;
+  final Poll cardData;
 
   @override
   State<StatefulWidget> createState() => _SongCardState();
@@ -112,87 +120,57 @@ class _SongCardState extends State<SongCard> {
     final containerWidth = maxWidth > screenWidth ? screenWidth : maxWidth;
     final containerHeight = containerWidth / aspectRatio;
 
+    Song pollSong = widget.cardData.song;
+
     return Card(
-      margin: EdgeInsets.all(containerWidth * 0.01),
+      margin: const EdgeInsets.all(0),
       color: Colors.blue,
       elevation: 0.0,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.black
-              .withOpacity(0.15 * widget.index), // Tint color with opacity
-          borderRadius:
-          BorderRadius.circular(11.0), // Match card's border radius
-        ),
-        child: ColorFiltered(
-          colorFilter: ColorFilter.mode(
-            Colors.black
-                .withOpacity(0.15 * widget.index), // Tint color for contents
-            BlendMode.srcATop, // Blend mode for tinting
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(containerWidth *
-                    0.01), // Adjust the padding value as needed
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(widget.cardData.trackArt),
-                    ),
-                    Positioned(
-                      top: 0, // Align to the top
-                      right: 0, // Align to the right
-                      child: Container(
-                        constraints: BoxConstraints(
-                          maxWidth: containerWidth * 0.16,
-                          maxHeight: containerWidth * 0.2,
-                        ),
-                        child: RingChart(votes: widget.cardData.votes, size: containerWidth * 0.1,),
-                      ),
-                    ),
-                  ],
-                )
-              ),
-              Padding(
-                padding: EdgeInsets.all(containerHeight * 0.01),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      widget.cardData.songName,
-                      style: TextStyle(fontSize: containerWidth * 0.03),
-                    ),
-                    Text(
-                      widget.cardData.artistName,
-                      style: TextStyle(fontSize: containerWidth * 0.03),
-                    ),
-                  ],
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(containerWidth *
+                0.01), // Adjust the padding value as needed
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(widget.cardData.song.imageUrl),
                 ),
-              ),
-            ],
+                Positioned(
+                  top: 0, // Align to the top
+                  right: 0, // Align to the right
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: containerWidth * 0.16,
+                      maxHeight: containerWidth * 0.2,
+                    ),
+                    child: RingChart(votes: [widget.cardData.upvotes, widget.cardData.downvotes], size: containerWidth * 0.1,),
+                  ),
+                ),
+              ],
+            )
           ),
-        ),
+          Padding(
+            padding: EdgeInsets.all(containerHeight * 0.01),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  pollSong.title,
+                  style: TextStyle(fontSize: containerWidth * 0.03),
+                ),
+                Text(
+                  pollSong.artists.toString().substring(1, pollSong.artists.toString().length - 1),
+                  style: TextStyle(fontSize: containerWidth * 0.03),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class SongCardData extends MediaItemData{
-  const SongCardData({
-    required this.songName,
-    required this.artistName,
-    required String trackArt,
-    required this.votes,
-  }) : super(
-    title: songName,
-    details: artistName,
-    imageUrl: trackArt,
-  );
-
-  final String songName;
-  final String artistName;
-  String get trackArt => imageUrl;
-  final List<double> votes;
-}

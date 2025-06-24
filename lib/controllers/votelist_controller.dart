@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:html';
+import 'package:universal_html/html.dart';
 
-import 'package:spotify_polls/models/media_item.dart';
 import 'package:spotify_polls/models/votelist.dart';
+import 'package:spotify_polls/models/playlist.dart';
 
 class VotelistController {
   static const String baseUrl = "http://127.0.0.1:3000";
@@ -63,7 +63,8 @@ class VotelistController {
     }
   }
 
-  Future<MediaItemData> getUserPlaylists() async {
+  Future<List<Playlist>> getUserPlaylists() async {
+    print('called getUserPlaylists() function in controller');
     final request = await HttpRequest.request(
       '$baseUrl/votelists/playlists',
       method: 'GET',
@@ -72,7 +73,11 @@ class VotelistController {
     );
 
     if (request.status! < 400 && request.status! >= 100) {
-      return const MediaItemData(title: 'title', details: 'details');
+      log('Successful response status');
+      final List<dynamic> data = jsonDecode(request.responseText!);
+      final playlists = data.map((item) => Playlist.fromJson(item)).toList();
+      print(playlists.toString());
+      return playlists;
     } else {
       throw Exception(
           'Failed to retrieve the user\'s playlists with status: ${request.status}');
